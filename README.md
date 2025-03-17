@@ -1,6 +1,6 @@
 # AetherXSS Scanner
 
-Advanced Cross-Site Scripting Scanner with Animation Support and Docker Integration
+Advanced Cross-Site Scripting Scanner with Docker Integration
 
 ## Features
 
@@ -91,4 +91,4 @@ MIT License
 
 ## Author
 
-@ibrahimsql 
+@ibrahimsql ibrahimsql@proton.me
