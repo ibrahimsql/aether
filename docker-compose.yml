@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  aetherxss:
+    build: .
+    volumes:
+      - ./reports:/app/reports
+      - ./wordlists:/app/wordlists
+      - ./custom_payloads:/app/custom_payloads
+    environment:
+      - DOTNET_ENVIRONMENT=Production
+      - AETHERXSS_THREADS=10
+      - AETHERXSS_TIMEOUT=30
+      - AETHERXSS_DELAY=100
+    networks:
+      - aether_net
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+
+networks:
+  aether_net:
+    driver: bridge 
