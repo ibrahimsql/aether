@@ -339,12 +339,12 @@ namespace AetherXSS
    ░██▄▄▄▄██░ ▓██▓ ░ ░▓█ ░██ ▒▓█  ▄ ▒██▀▀█▄   ░ █ █ ▒   ▒   ██▒  ▒   ██▒
     ▓█   ▓██▒ ▒██▒ ░ ░▓█▒░██▓░▒████▒░██▓ ▒██▒▒██▒ ▒██▒▒██████▒▒▒██████▒▒
     ▒▒   ▓▒█░ ▒ ░░    ▒ ░░▒░▒░░ ▒░ ░░ ▒▓ ░▒▓░▒▒ ░ ░▓ ░▒ ▒▓▒ ▒ ░▒ ▒▓▒ ▒ ░";
-                                                  @ibrahimsql :)
-            
+
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine(banner);
             
-            Console.WriteLine("\nAetherXSS - Advanced Cross-Site Scripting Scanner\n");
+            Console.WriteLine("\nAetherXSS - Advanced Cross-Site Scripting Scanner");
+            Console.WriteLine("Developer: @ibrahimsql\n");
             
             Console.ResetColor();
         }
