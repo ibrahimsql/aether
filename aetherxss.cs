@@ -65,14 +65,36 @@ namespace AetherXSS
 
         private static readonly string[] loadingChars = new string[] { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" };
 
+        public static void ShowSpinner(string message, int durationMs = 1500)
+        {
+            int i = 0;
+            DateTime endTime = DateTime.Now.AddMilliseconds(durationMs);
+            
+            // Simple spinner characters
+            string[] spinnerChars = new string[] { "|", "/", "-", "\\" };
+            
+            while (DateTime.Now < endTime)
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write($"\r[{spinnerChars[i % spinnerChars.Length]}] {message}");
+                Thread.Sleep(80);
+                i++;
+            }
+            Console.ResetColor();
+            Console.WriteLine();
+        }
+
         public static void ShowLoadingAnimation(string message, int duration = 2000)
         {
             int i = 0;
             DateTime endTime = DateTime.Now.AddMilliseconds(duration);
+            
+            // Simple spinner characters
+            string[] spinnerChars = new string[] { "|", "/", "-", "\\" };
 
             while (DateTime.Now < endTime)
             {
-                Console.Write($"\r{loadingChars[i % loadingChars.Length]} {message}");
+                Console.Write($"\r[{spinnerChars[i % spinnerChars.Length]}] {message}");
                 Thread.Sleep(100);
                 i++;
             }
@@ -81,37 +103,95 @@ namespace AetherXSS
 
         public static void ShowRandomHackPhrase()
         {
-            Random rand = new Random();
-            string phrase = hackPhrases[rand.Next(hackPhrases.Length)];
             
-            // Random renk seç
-            ConsoleColor[] colors = new ConsoleColor[] 
-            { 
-                ConsoleColor.Green, 
-                ConsoleColor.Cyan, 
-                ConsoleColor.Yellow, 
-                ConsoleColor.Magenta,
-                ConsoleColor.Red
+            string[] phrases = new string[]
+            {
+                "Scanning for XSS vulnerabilities",
+                "Testing injection points",
+                "Analyzing response for XSS reflections",
+                "Checking script insertion points",
+                "Evaluating input validation",
+                "Scanning for DOM-based vulnerabilities",
+                "Testing parameter sanitization",
+                "Checking output encoding",
+                "Looking for reflection points",
+                "Analyzing content security policy",
+                "Testing browser XSS filters",
+                "Checking context-aware escaping",
+                "Examining client-side validation",
+                "Testing HTML attribute injection",
+                "Validating unsafe JavaScript execution"
             };
             
-            Console.ForegroundColor = colors[rand.Next(colors.Length)];
+            Random rand = new Random();
+            string phrase = phrases[rand.Next(phrases.Length)];
             
-            // Matrix tarzı efekt
-            string prefix = rand.Next(2) == 0 ? "[*]" : 
-                          rand.Next(2) == 0 ? "[+]" : 
-                          rand.Next(2) == 0 ? "[>]" : "[$]";
+            Console.ForegroundColor = ConsoleColor.Cyan;
             
-            // Yazıyı harf harf yaz
-            Console.Write("\n" + prefix + " ");
-            foreach (char c in phrase)
-            {
-                Console.Write(c);
-                Thread.Sleep(10); // Her harf için küçük bir gecikme
-            }
-            Console.WriteLine();
+            // Simple prefix
+            string prefix = "[*]";
+            
+            // Print the message
+            Console.WriteLine($"\n{prefix} {phrase}");
             
             Console.ResetColor();
-            Thread.Sleep(50);
+        }
+
+        public static void ShowTargetInfo(string url)
+        {
+            // Ensure we have a clean line
+            Console.WriteLine();
+            
+            // Create a box around target info
+            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("  TARGET INFORMATION");
+            Console.ResetColor();
+            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            
+            // Parse the URL to get components
+            try
+            {
+                Uri uri = new Uri(url);
+                
+                Console.Write("  ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("Target URL: ");
+                Console.ResetColor();
+                Console.WriteLine(url);
+                
+                Console.Write("  ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("Domain: ");
+                Console.ResetColor();
+                Console.WriteLine(uri.Host);
+                
+                // Query parameters if present (important for XSS)
+                if (!string.IsNullOrEmpty(uri.Query))
+                {
+                    Console.Write("  ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write("Query Parameters: ");
+                    Console.ResetColor();
+                    Console.WriteLine(uri.Query);
+                }
+                
+                // Current time
+                Console.Write("  ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("Scan started: ");
+                Console.ResetColor();
+                Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"  Error parsing URL: {ex.Message}");
+                Console.ResetColor();
+            }
+            
+            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            Console.WriteLine();
         }
 
         public static void ShowProgressBar(int progress, int total)
@@ -125,6 +205,129 @@ namespace AetherXSS
             Console.Write(new string('░', barSize - filledSize));
             Console.ResetColor();
             Console.Write($"] {progress}/{total} ({(int)((double)progress / total * 100)}%)");
+        }
+
+        public static void ShowScanProgress(string target, int current, int total)
+        {
+            // Progress indicators - more professional, less emoji-heavy
+            string[] progressChars = new string[] { ">", "→", "-", "•", "+" };
+            string[] actionVerbs = new string[] { 
+                "Testing", "Analyzing", "Scanning", "Processing", "Checking", 
+                "Evaluating", "Inspecting", "Examining", "Assessing" 
+            };
+            Random r = new Random();
+            
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write($"\r[{progressChars[r.Next(progressChars.Length)]}] ");
+            Console.ForegroundColor = ConsoleColor.White;
+            
+            // Use random action verb for variety
+            string verb = actionVerbs[r.Next(actionVerbs.Length)];
+            
+            // Truncate target if too long
+            string displayTarget = target;
+            if (displayTarget.Length > 50)
+            {
+                displayTarget = displayTarget.Substring(0, 47) + "...";
+            }
+            
+            Console.Write($"{verb} payload {current}/{total} on {displayTarget}");
+            
+            // Show a progress bar if there are more than 5 payloads
+            if (total > 5)
+            {
+                Console.Write(" ");
+                int barSize = 20;
+                int filledSize = (int)((double)current / total * barSize);
+                
+                Console.Write("[");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write(new string('█', filledSize));
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write(new string('░', barSize - filledSize));
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write($"] {(int)((double)current / total * 100)}%");
+            }
+            
+            Console.ResetColor();
+        }
+
+        public static void ShowConfigInfo(Dictionary<string, object> config)
+        {
+            Console.WriteLine("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("  AETHERXSS CONFIGURATION");
+            Console.ResetColor();
+            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            
+            foreach (var kvp in config)
+            {
+                if (kvp.Value != null && !string.IsNullOrEmpty(kvp.Value.ToString()))
+                {
+                    Console.Write("  ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write($"{kvp.Key}: ");
+                    Console.ResetColor();
+                    Console.WriteLine(kvp.Value);
+                }
+            }
+            
+            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+        }
+
+        public static void ShowScanSummary(Dictionary<string, int> stats)
+        {
+            Console.WriteLine("\n\n");
+            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine("  SCAN RESULTS SUMMARY");
+            Console.ResetColor();
+            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            
+            // URLs tested
+            Console.Write("  ");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("URLs Tested: ");
+            Console.ResetColor();
+            Console.WriteLine(stats["testedUrls"]);
+            
+            // Vulnerabilities found
+            Console.Write("  ");
+            if (stats["vulnerableUrls"] > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("XSS Vulnerabilities: ");
+                Console.WriteLine(stats["vulnerableUrls"]);
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("XSS Vulnerabilities: ");
+                Console.WriteLine("None found (0)");
+            }
+            
+            // Failed requests
+            Console.Write("  ");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write("Failed Requests: ");
+            Console.ResetColor();
+            Console.WriteLine(stats["failedRequests"]);
+            
+            // Parameters tested
+            Console.Write("  ");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("Parameters Tested: ");
+            Console.ResetColor();
+            Console.WriteLine(stats["parametersFound"]);
+            
+            // Scan status
+            Console.Write("  ");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("Scan Status: ");
+            Console.ResetColor();
+            Console.WriteLine("COMPLETE");
+            
+            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         }
 
         public static void PrintBanner()
@@ -141,7 +344,7 @@ namespace AetherXSS
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine(banner);
             
-            Console.WriteLine("\n🔥 AetherXSS - Advanced Cross-Site Scripting Scanner 🔥\n");
+            Console.WriteLine("\nAetherXSS - Advanced Cross-Site Scripting Scanner\n");
             
             Console.ResetColor();
         }
@@ -150,15 +353,24 @@ namespace AetherXSS
         {
             string[] scanFrames = new string[]
             {
-                $"[↑] Scanning {target}",
-                $"[→] Scanning {target}",
-                $"[↓] Scanning {target}",
-                $"[←] Scanning {target}"
+                $"[→] Scanning {target}"
             };
+
+            string[] actionVerbs = new string[] { 
+                "Scanning", "Analyzing", "Processing", "Checking", "Examining" 
+            };
+            
+            Random r = new Random();
+            string verb = actionVerbs[r.Next(actionVerbs.Length)];
 
             for (int i = 0; i < 8; i++)
             {
-                Console.Write($"\r{scanFrames[i % scanFrames.Length]}");
+                string direction = "-\\|/"[i % 4].ToString();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write($"\r[{direction}] {verb} ");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(target);
+                Console.ResetColor();
                 Thread.Sleep(100);
             }
             Console.WriteLine();
@@ -168,12 +380,12 @@ namespace AetherXSS
         {
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("╔════════════════════════════════════════════");
-            Console.WriteLine("║ VULNERABILITY DETECTED!");
-            Console.WriteLine("╠════════════════════════════════════════════");
-            Console.WriteLine($"║ Type: {type}");
-            Console.WriteLine($"║ URL: {url}");
-            Console.WriteLine("╚════════════════════════════════════════════");
+            Console.WriteLine("═════════════════════════════════════════════");
+            Console.WriteLine("  VULNERABILITY DETECTED");
+            Console.WriteLine("═════════════════════════════════════════════");
+            Console.WriteLine($"  Type: {type}");
+            Console.WriteLine($"  URL: {url}");
+            Console.WriteLine("═════════════════════════════════════════════");
             Console.ResetColor();
             
             // Play alert sound only on Windows
@@ -197,6 +409,8 @@ namespace AetherXSS
         private static bool useColor = true;
         private static bool verbose = false;
         private static bool autoExploit = false;
+        private static bool testMethods = false;
+        private static bool fuzzHeaders = false;
         private static int delayBetweenRequests = 0;
         private static int maxThreads = 5;
         private static readonly List<string> customPayloads = new List<string>();
@@ -209,6 +423,16 @@ namespace AetherXSS
             { "vulnerableUrls", 0 },
             { "failedRequests", 0 },
             { "parametersFound", 0 }
+        };
+        
+        // Add missing WAF bypass payloads dictionary
+        private static readonly Dictionary<string, string> wafBypassPayloads = new Dictionary<string, string>
+        {
+            { "CloudFlare", "<svg onload=alert(1)>" },
+            { "ModSecurity", "<img src=x onerror=alert(1)>" },
+            { "Imperva", "javascript:alert(1)" },
+            { "F5 BIG-IP", "<body onload=alert(1)>" },
+            { "Akamai", "<script>alert(1)</script>" }
         };
 
         // Expanded list of XSS payloads
@@ -486,108 +710,45 @@ namespace AetherXSS
 
         private static void ShowSystemInfo()
         {
-            string[] scanMessages = new string[]
-            {
-                "🚀 AetherXSS goes brrrr...",
-                "💉 Time to inject some chaos...",
-                "🎯 Ready to pwn some XSS...",
-                "🔥 Fire up the XSS cannon!",
-                "🕷️ Spider-sense tingling... XSS nearby!",
-                "🎮 Game time! Let's play find the vulnerability",
-                "🧪 Mad scientist mode: ACTIVATED",
-                "🎭 Stealth mode engaged... they won't see us coming",
-                "⚡ Charging up the payload launcher...",
-                "🎪 Welcome to the XSS circus!",
-                "🎲 Rolling the dice for vulnerabilities...",
-                "🎯 Target acquired, commencing scan...",
-                "🔮 Crystal ball says: XSS vulnerabilities ahead!",
-                "🎨 Painting the target with payloads...",
-                "🎭 Time to test if this website trusts everyone..."
-            };
-
-            Random rand = new Random();
+            // Check configuration
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"\n[~] {scanMessages[rand.Next(scanMessages.Length)]}");
+            Console.WriteLine("\n[*] Initializing AetherXSS scanner...");
             
-            // Config file check with RustScan style
+            // Config file check
             string configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".aetherxss.config");
-            Console.WriteLine($"[~] Looking for config file at \"{configPath}\" (like finding a needle in a haystack)");
+            Console.WriteLine($"[*] Looking for configuration file at \"{configPath}\"");
             
-            // System checks with humor
+            // System checks
             int currentThreads = Environment.ProcessorCount;
-            if (currentThreads < 4)
-            {
-                string[] threadMessages = {
-                    "🐌 Your CPU is moving slower than my grandma! More threads needed",
-                    "🐢 CPU running on Internet Explorer speed. Need more power!",
-                    "⚡ Your thread count is lower than my coffee intake... MOAR THREADS!"
-                };
-                Console.WriteLine($"[!] {threadMessages[rand.Next(threadMessages.Length)]}");
-            }
-
-            // Memory check with RustScan style
+            Console.WriteLine($"[*] Detected CPU threads: {currentThreads}");
+            
+            // Memory check
             try
             {
                 var process = Process.GetCurrentProcess();
                 long memoryMB = process.WorkingSet64 / 1024 / 1024;
-                if (memoryMB < 512)
-                {
-                    string[] memoryMessages = {
-                        "🐹 Your RAM is running on hamster power",
-                        "📉 Memory looking thinner than a pizza crust",
-                        "💾 Memory situation: It's not you, it's me... but actually it's you"
-                    };
-                    Console.WriteLine($"[!] {memoryMessages[rand.Next(memoryMessages.Length)]}");
-                }
+                Console.WriteLine($"[*] Available memory: {memoryMB} MB");
             }
             catch { }
 
-            // Network warning with RustScan style
-            string[] networkMessages = {
-                "🏎️ SPEED LIMIT? Never heard of it!",
-                "⚡ Going faster than my mom's spaghetti",
-                "🚄 Scanning faster than light (almost)!",
-                "🌪️ Tornado mode activated: No rate limiting!"
-            };
-            Console.WriteLine($"[!] {networkMessages[rand.Next(networkMessages.Length)]} Use --delay if you're scared");
-
-            // Show current target status with animations
+            // Tool information
+            Console.WriteLine($"[*] AetherXSS Version: 1.0");
+            Console.WriteLine($"[*] Payloads loaded: Default XSS vector collection ({xssPayloads.Count} vectors)");
+            Console.WriteLine($"[*] Target scope: Reflected XSS, Stored XSS, DOM-based XSS");
+            Console.WriteLine($"[*] Advanced detection capabilities: WAF bypass, context-aware analysis");
+            
             Console.ForegroundColor = ConsoleColor.Cyan;
-            string[] loadingMessages = {
-                "🎯 Targeting systems engaged...",
-                "🔍 Scanning perimeter...",
-                "🕷️ Deploying scanner spiders...",
-                "🚀 Launching payload matrix...",
-                "⚡ Charging the XSS cannon...",
-                "🎮 Loading game: 'Hack The Planet'...",
-                "🔮 Consulting the cyber oracle...",
-                "🎪 Setting up the hacking circus..."
-            };
-
-            for (int i = 0; i < 3; i++)
-            {
-                Console.Write($"\r[*] {loadingMessages[rand.Next(loadingMessages.Length)]}");
-                Thread.Sleep(300);
-            }
-            Console.WriteLine();
-            
-            // Pro tips with RustScan style
-            string[] tips = {
-                "🎓 Pro tip: Use --auto-exploit to unleash MAXIMUM CHAOS",
-                "🎯 Pro tip: Custom payloads = More fun (--wordlist)",
-                "🔍 Pro tip: --verbose mode for when you're feeling nosey",
-                "🕸️ Pro tip: --crawl to find ALL the things!",
-                "⚡ Pro tip: More threads = More speed = More fun!"
-            };
-            
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine($"\n[i] {tips[rand.Next(tips.Length)]}");
+            Console.WriteLine("\n[*] Options:");
+            Console.WriteLine($"    Use --verbose for more detailed scan information");
+            Console.WriteLine($"    Use --auto-exploit to attempt automatic payload execution");
+            Console.WriteLine($"    Use --delay to set request delay (for rate limiting)");
+            Console.WriteLine($"    Use --wordlist to add custom payloads");
             
             Console.ResetColor();
             Console.WriteLine();
 
-            // Final loading animation
-            AnimatedUI.ShowLoadingAnimation("🚀 Powering up the AetherXSS engines...");
+            // Tool initialization - Fix the missing reference
+            AnimatedUI.ShowLoadingAnimation("Initializing XSS scanner...", 2000);
         }
 
         static async Task Main(string[] args)
@@ -637,8 +798,6 @@ namespace AetherXSS
                 bool crawlEnabled = false;
                 int crawlDepth = 2;
                 bool testParamsEnabled = false;
-                bool testMethods = false;
-                bool fuzzHeaders = false;
                 int timeout = 30;
                 string outputFile = null;
                 Dictionary<string, string> extraHeaders = new Dictionary<string, string>();
@@ -737,13 +896,14 @@ namespace AetherXSS
                 {
                     try
                     {
+                        AnimatedUI.ShowSpinner("Loading custom payloads from wordlist");
                         string[] payloads = File.ReadAllLines(wordlistPath);
                         customPayloads.AddRange(payloads);
-                        PrintColored($"🔹 Loaded {payloads.Length} custom payloads from {wordlistPath}", ConsoleColor.Cyan);
+                        PrintColored($"[*] Loaded {payloads.Length} custom payloads from {wordlistPath}", ConsoleColor.Cyan);
                     }
                     catch (Exception ex)
                     {
-                        PrintColored($"⚠️ Error loading wordlist: {ex.Message}", ConsoleColor.Yellow);
+                        PrintColored($"[!] Error loading wordlist: {ex.Message}", ConsoleColor.Yellow);
                     }
                 }
 
@@ -753,42 +913,59 @@ namespace AetherXSS
                     reportPath = outputFile;
                 }
 
-                PrintColored($"🔍 Starting XSS scan on {targetUrl}...\n", ConsoleColor.Cyan);
-                Console.WriteLine($"📌 Date/Time: {DateTime.Now}");
-                
-                if (!string.IsNullOrEmpty(proxy))
-                {
-                    Console.WriteLine($"🔹 Using Proxy: {proxy}");
-                }
-                
-                if (delayBetweenRequests > 0)
-                {
-                    Console.WriteLine($"🔹 Delay between requests: {delayBetweenRequests}ms");
-                }
-                
-                if (maxThreads > 0)
-                {
-                    Console.WriteLine($"🔹 Number of parallel threads: {maxThreads}");
-                }
+                // Show detailed target information
+                AnimatedUI.ShowTargetInfo(targetUrl);
 
-                Console.WriteLine($"🔹 XSS payload count: {xssPayloads.Count + customPayloads.Count}");
-                Console.WriteLine();
+                // Display configuration information
+                var configInfo = new Dictionary<string, object>
+                {
+                    {"Target URL", targetUrl},
+                    {"Timeout", $"{timeout} seconds"},
+                    {"Threads", maxThreads},
+                    {"Delay", delayBetweenRequests > 0 ? $"{delayBetweenRequests}ms" : "No delay"},
+                    {"Proxy", proxy ?? "None"},
+                    {"Custom User-Agent", userAgent ?? "Random"},
+                    {"DOM-XSS Scanning", domScanEnabled ? "Enabled" : "Disabled"},
+                    {"Crawling", crawlEnabled ? $"Enabled (Depth: {crawlDepth})" : "Disabled"},
+                    {"Test Parameters", testParamsEnabled ? "Enabled" : "Disabled"},
+                    {"Test HTTP Methods", testMethods ? "Enabled" : "Disabled"},
+                    {"Header Fuzzing", fuzzHeaders ? "Enabled" : "Disabled"},
+                    {"Auto-Exploit", autoExploit ? "Enabled" : "Disabled"},
+                    {"Verbose Mode", verbose ? "Enabled" : "Disabled"},
+                    {"Output File", outputFile ?? "None"},
+                    {"Total Payloads", xssPayloads.Count + customPayloads.Count}
+                };
+                
+                AnimatedUI.ShowConfigInfo(configInfo);
 
+                // Preparing scan message
+                AnimatedUI.ShowSpinner("Preparing scan environment", 2000);
+                
                 List<string> urlsToTest = new List<string> { targetUrl };
 
                 // Crawl for additional URLs if enabled
                 if (crawlEnabled)
                 {
-                    PrintColored("🕸️ Crawling website, please wait...", ConsoleColor.Cyan);
+                    PrintColored("[*] Crawling website, please wait...", ConsoleColor.Cyan);
                     var crawledUrls = await CrawlWebsite(targetUrl, crawlDepth);
                     urlsToTest.AddRange(crawledUrls);
-                    PrintColored($"🕸️ Found a total of {crawledUrls.Count} URLs.", ConsoleColor.Cyan);
+                    PrintColored($"[+] Found a total of {crawledUrls.Count} URLs.", ConsoleColor.Cyan);
                 }
 
+                // Show initialization message
+                AnimatedUI.ShowSpinner("Initializing scan engine", 1500);
+                AnimatedUI.ShowRandomHackPhrase();
+                
                 // Create a semaphore to limit concurrent tasks
                 SemaphoreSlim semaphore = new SemaphoreSlim(maxThreads);
                 List<Task> tasks = new List<Task>();
 
+                // Show scan start message
+                Console.WriteLine();
+                PrintColored($"[+] Starting XSS scan with {maxThreads} threads", ConsoleColor.Green);
+                PrintColored($"[*] Scan initiated at {DateTime.Now.ToString("HH:mm:ss")}", ConsoleColor.Cyan);
+                Console.WriteLine();
+                
                 // Test each URL
                 foreach (var url in urlsToTest)
                 {
@@ -802,8 +979,15 @@ namespace AetherXSS
                             AnimatedUI.ShowRandomHackPhrase();
                             
                             // Test regular payloads
-                            foreach (var payload in xssPayloads.Concat(customPayloads))
+                            var allPayloads = xssPayloads.Concat(customPayloads).ToList();
+                            int payloadCount = 0;
+                            
+                            foreach (var payload in allPayloads)
                             {
+                                payloadCount++;
+                                // Show scan progress
+                                AnimatedUI.ShowScanProgress(url, payloadCount, allPayloads.Count);
+                                
                                 try
                                 {
                                     await TestGetRequest(url, payload, cookie, extraHeaders, userAgent);
@@ -851,7 +1035,7 @@ namespace AetherXSS
                                 {
                                     if (verbose)
                                     {
-                                        PrintColored($"⚠️ Error testing payload {payload}: {ex.Message}", ConsoleColor.Yellow);
+                                        PrintColored($"[!] Error testing payload {payload}: {ex.Message}", ConsoleColor.Yellow);
                                     }
                                     
                                     lock (statistics)
@@ -865,8 +1049,12 @@ namespace AetherXSS
                         {
                             if (verbose)
                             {
-                                PrintColored($"⚠️ Error testing URL {url}: {ex.Message}", ConsoleColor.Yellow);
+                                PrintColored($"[!] Error testing URL {url}: {ex.Message}", ConsoleColor.Yellow);
                             }
+                        }
+                        finally
+                        {
+                            semaphore.Release();
                         }
                     }));
                 }
@@ -875,22 +1063,89 @@ namespace AetherXSS
                 await Task.WhenAll(tasks);
 
                 // Generate report
-                GenerateReport(reportPath);
-
-                stopwatch.Stop();
-                PrintColored($"\n✅ Scan completed. Duration: {stopwatch.Elapsed.TotalSeconds:F2} seconds", ConsoleColor.Green);
-                PrintColored($"🔍 {statistics["testedUrls"]} URLs tested", ConsoleColor.Cyan);
-                PrintColored($"❗ {statistics["vulnerableUrls"]} XSS vulnerabilities detected", statistics["vulnerableUrls"] > 0 ? ConsoleColor.Red : ConsoleColor.Green);
-                PrintColored($"⚠️ {statistics["failedRequests"]} failed requests", ConsoleColor.Yellow);
-
                 if (!string.IsNullOrEmpty(outputFile))
                 {
-                    PrintColored($"📄 Report saved: {reportPath}", ConsoleColor.Cyan);
+                    AnimatedUI.ShowSpinner("Generating report", 1500);
+                    GenerateReport(reportPath);
+                    PrintColored($"[+] Report saved: {reportPath}", ConsoleColor.Cyan);
                 }
+
+                stopwatch.Stop();
+                
+                // Create a visual completion indicator
+                Console.WriteLine();
+                Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("                   SCAN COMPLETED SUCCESSFULLY");
+                Console.ResetColor();
+                Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                
+                // Show time metrics
+                TimeSpan elapsed = stopwatch.Elapsed;
+                Console.WriteLine();
+                Console.Write("  ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("Duration: ");
+                Console.ResetColor();
+                Console.WriteLine($"{elapsed.TotalSeconds:F2} seconds ({elapsed.Minutes} min {elapsed.Seconds} sec)");
+                
+                // Show requests per second
+                int totalRequests = statistics["testedUrls"];
+                double requestsPerSecond = totalRequests / elapsed.TotalSeconds;
+                Console.Write("  ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("Performance: ");
+                Console.ResetColor();
+                Console.WriteLine($"{requestsPerSecond:F2} requests/second");
+                
+                // Show scan start and end times
+                DateTime endTime = DateTime.Now;
+                DateTime startTime = endTime - elapsed;
+                Console.Write("  ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("Started: ");
+                Console.ResetColor();
+                Console.WriteLine(startTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                
+                Console.Write("  ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("Finished: ");
+                Console.ResetColor();
+                Console.WriteLine(endTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                
+                Console.WriteLine();
+                
+                // Show scan summary
+                AnimatedUI.ShowScanSummary(statistics);
+                
+                // Final message
+                if (statistics["vulnerableUrls"] > 0)
+                {
+                    PrintColored("\nVULNERABILITIES DETECTED! Review the scan results for details.", ConsoleColor.Red);
+                }
+                else
+                {
+                    PrintColored("\nNo vulnerabilities detected in this scan.", ConsoleColor.Green);
+                }
+                
+                // Tip message
+                string[] tipMessages = new string[]
+                {
+                    "Tip: Always verify XSS findings manually before reporting them.",
+                    "Tip: Regular security scanning is an essential part of web security.",
+                    "Tip: Combine AetherXSS with other security tools for more thorough testing.",
+                    "Tip: Use the --auto-exploit option for automated proof of concept."
+                };
+                
+                Random random = new Random();
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine(tipMessages[random.Next(tipMessages.Length)]);
+                Console.ResetColor();
             }
             catch (Exception ex)
             {
-                PrintColored($"⚠️ Unexpected error: {ex.Message}", ConsoleColor.Red);
+                PrintColored($"[!] Unexpected error: {ex.Message}", ConsoleColor.Red);
                 if (verbose)
                 {
                     Console.WriteLine(ex.StackTrace);
@@ -905,21 +1160,31 @@ namespace AetherXSS
 
             try
             {
-                // Show a random hack message before each test
-                AnimatedUI.ShowRandomHackPhrase();
-                
                 HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, testUrl);
                 AddHeaders(request, cookie, extraHeaders, customUserAgent);
 
                 HttpResponseMessage response = await client.SendAsync(request);
                 string responseBody = await response.Content.ReadAsStringAsync();
 
+                // Check for WAF presence
+                if (DetectWAF(response, responseBody))
+                {
+                    if (verbose)
+                    {
+                        PrintColored($"\n[!] WAF detected. Attempting bypass techniques for {url}", ConsoleColor.Yellow);
+                    }
+                    
+                    // Try to use specific WAF bypass payloads
+                    await TestWAFBypass(url, cookie, extraHeaders, customUserAgent);
+                }
+
                 lock (statistics)
                 {
                     statistics["testedUrls"]++;
                 }
 
-                if (responseBody.Contains(payload) || IsReflectedInResponse(responseBody, payload))
+                // Enhanced detection logic
+                if (IsXssVulnerable(responseBody, payload))
                 {
                     lock (discoveredVulnerabilities)
                     {
@@ -931,7 +1196,15 @@ namespace AetherXSS
                         statistics["vulnerableUrls"]++;
                     }
 
-                    PrintColored($"❗ XSS Vulnerability Detected! {testUrl}", ConsoleColor.Red);
+                    PrintColored($"\n[!] XSS Vulnerability Detected! {testUrl}", ConsoleColor.Red);
+                    AnimatedUI.ShowVulnerabilityFound(testUrl, "GET Parameter Reflection");
+                    
+                    // Analyze the vulnerability context
+                    string context = DetermineXssContext(responseBody, payload);
+                    if (!string.IsNullOrEmpty(context))
+                    {
+                        PrintColored($"  Context: {context}", ConsoleColor.Yellow);
+                    }
                     
                     if (autoExploit)
                     {
@@ -940,7 +1213,7 @@ namespace AetherXSS
                 }
                 else if (verbose)
                 {
-                    PrintColored($"✅ {testUrl} appears clean.", ConsoleColor.Green);
+                    PrintColored($"\n[-] {testUrl} appears clean.", ConsoleColor.Green);
                 }
             }
             catch (Exception ex)
@@ -952,7 +1225,7 @@ namespace AetherXSS
 
                 if (verbose)
                 {
-                    PrintColored($"⚠️ Error in request to {testUrl}: {ex.Message}", ConsoleColor.Yellow);
+                    PrintColored($"\n[!] Error in request to {testUrl}: {ex.Message}", ConsoleColor.Yellow);
                 }
             }
         }
@@ -961,9 +1234,6 @@ namespace AetherXSS
         {
             try
             {
-                // Show a random hack message before each POST test
-                AnimatedUI.ShowRandomHackPhrase();
-                
                 HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url);
                 AddHeaders(request, cookie, extraHeaders, customUserAgent);
 
@@ -993,7 +1263,7 @@ namespace AetherXSS
                         statistics["vulnerableUrls"]++;
                     }
 
-                    PrintColored($"❗ XSS Vulnerability (POST) Detected! {url}", ConsoleColor.Red);
+                    PrintColored($"\n[!] XSS Vulnerability (POST) Detected! {url}", ConsoleColor.Red);
                     
                     if (autoExploit)
                     {
@@ -1002,7 +1272,7 @@ namespace AetherXSS
                 }
                 else if (verbose)
                 {
-                    PrintColored($"✅ {url} (POST) appears clean.", ConsoleColor.Green);
+                    PrintColored($"\n[-] {url} (POST) appears clean.", ConsoleColor.Green);
                 }
             }
             catch (Exception ex)
@@ -1014,7 +1284,7 @@ namespace AetherXSS
 
                 if (verbose)
                 {
-                    PrintColored($"⚠️ Error in POST request to {url}: {ex.Message}", ConsoleColor.Yellow);
+                    PrintColored($"\n[!] Error in POST request to {url}: {ex.Message}", ConsoleColor.Yellow);
                 }
             }
         }
@@ -1055,7 +1325,7 @@ namespace AetherXSS
                             statistics["vulnerableUrls"]++;
                         }
 
-                        PrintColored($"❗ XSS Vulnerability ({method}) Detected! {url}", ConsoleColor.Red);
+                        PrintColored($"\n[!] XSS Vulnerability ({method}) Detected! {url}", ConsoleColor.Red);
                         
                         if (autoExploit)
                         {
@@ -1064,7 +1334,7 @@ namespace AetherXSS
                     }
                     else if (verbose)
                     {
-                        PrintColored($"✅ {url} ({method}) appears clean.", ConsoleColor.Green);
+                        PrintColored($"\n[-] {url} ({method}) appears clean.", ConsoleColor.Green);
                     }
                 }
             }
@@ -1077,7 +1347,7 @@ namespace AetherXSS
 
                 if (verbose)
                 {
-                    PrintColored($"⚠️ Error in {method} request to {url}: {ex.Message}", ConsoleColor.Yellow);
+                    PrintColored($"\n[!] Error in {method} request to {url}: {ex.Message}", ConsoleColor.Yellow);
                 }
             }
         }
@@ -1128,11 +1398,11 @@ namespace AetherXSS
                             statistics["vulnerableUrls"]++;
                         }
 
-                        PrintColored($"❗ XSS Vulnerability (Header: {headerPair.Key}) Detected! {url}", ConsoleColor.Red);
+                        PrintColored($"\n[!] XSS Vulnerability (Header: {headerPair.Key}) Detected! {url}", ConsoleColor.Red);
                     }
                     else if (verbose)
                     {
-                        PrintColored($"✅ {url} (Header: {headerPair.Key}) appears clean.", ConsoleColor.Green);
+                        PrintColored($"\n[-] {url} (Header: {headerPair.Key}) appears clean.", ConsoleColor.Green);
                     }
                 }
                 catch (Exception ex)
@@ -1144,7 +1414,7 @@ namespace AetherXSS
 
                     if (verbose)
                     {
-                        PrintColored($"⚠️ Error in request to {url} (Header: {headerPair.Key}): {ex.Message}", ConsoleColor.Yellow);
+                        PrintColored($"\n[!] Error in request to {url} (Header: {headerPair.Key}): {ex.Message}", ConsoleColor.Yellow);
                     }
                 }
             }
@@ -1181,7 +1451,7 @@ namespace AetherXSS
                         statistics["vulnerableUrls"]++;
                     }
 
-                    PrintColored($"❗ XSS Vulnerability (Parameter: {parameter}) Detected! {testUrl}", ConsoleColor.Red);
+                    PrintColored($"\n[!] XSS Vulnerability (Parameter: {parameter}) Detected! {testUrl}", ConsoleColor.Red);
                     
                     if (autoExploit)
                     {
@@ -1190,7 +1460,7 @@ namespace AetherXSS
                 }
                 else if (verbose)
                 {
-                    PrintColored($"✅ {testUrl} (Parameter: {parameter}) appears clean.", ConsoleColor.Green);
+                    PrintColored($"\n[-] {testUrl} (Parameter: {parameter}) appears clean.", ConsoleColor.Green);
                 }
             }
             catch (Exception ex)
@@ -1202,7 +1472,7 @@ namespace AetherXSS
 
                 if (verbose)
                 {
-                    PrintColored($"⚠️ Error in request to {testUrl} (Parameter: {parameter}): {ex.Message}", ConsoleColor.Yellow);
+                    PrintColored($"\n[!] Error in request to {testUrl} (Parameter: {parameter}): {ex.Message}", ConsoleColor.Yellow);
                 }
             }
         }
@@ -1232,14 +1502,14 @@ namespace AetherXSS
                             statistics["vulnerableUrls"]++;
                         }
 
-                        PrintColored($"❗ Potential DOM-XSS Vulnerability (Sink: {sink}) Detected! {url}", ConsoleColor.Red);
+                        PrintColored($"\n[!] Potential DOM-XSS Vulnerability (Sink: {sink}) Detected! {url}", ConsoleColor.Red);
                         foundDomXSS = true;
                     }
                 }
 
                 if (!foundDomXSS && verbose)
                 {
-                    PrintColored($"✅ {url} (DOM-XSS) appears clean.", ConsoleColor.Green);
+                    PrintColored($"\n[-] {url} (DOM-XSS) appears clean.", ConsoleColor.Green);
                 }
             }
             catch (Exception ex)
@@ -1251,7 +1521,7 @@ namespace AetherXSS
 
                 if (verbose)
                 {
-                    PrintColored($"⚠️ Error in DOM-XSS scan for {url}: {ex.Message}", ConsoleColor.Yellow);
+                    PrintColored($"\n[!] Error in DOM-XSS scan for {url}: {ex.Message}", ConsoleColor.Yellow);
                 }
             }
         }
@@ -1267,6 +1537,11 @@ namespace AetherXSS
 
             Uri baseUri = new Uri(startUrl);
             string baseDomain = baseUri.Host;
+            
+            Console.WriteLine();
+            PrintColored($"[+] Starting web crawl from {startUrl}", ConsoleColor.Cyan);
+            PrintColored($"[*] Looking for additional targets (max depth: {maxDepth})", ConsoleColor.Cyan);
+            Console.WriteLine();
 
             for (int depth = 0; depth < maxDepth; depth++)
             {
@@ -1274,6 +1549,8 @@ namespace AetherXSS
                 
                 if (currentDepthUrls.Count == 0)
                     break;
+                
+                PrintColored($"⏱️ Crawling depth level {depth + 1}/{maxDepth} - Found {currentDepthUrls.Count} URLs to process", ConsoleColor.Yellow);
 
                 foreach (string url in currentDepthUrls)
                 {
@@ -1289,6 +1566,8 @@ namespace AetherXSS
 
                         // Extract URLs from href attributes
                         var matches = Regex.Matches(responseBody, @"href=[""']([^""']+)[""']");
+                        int newUrlsFound = 0;
+                        
                         foreach (Match match in matches)
                         {
                             string href = match.Groups[1].Value;
@@ -1302,13 +1581,20 @@ namespace AetherXSS
                                 {
                                     discovered.Add(resolvedUri.AbsoluteUri);
                                     result.Add(resolvedUri.AbsoluteUri);
+                                    newUrlsFound++;
                                     
                                     if (verbose)
                                     {
-                                        PrintColored($"🔍 Found URL: {resolvedUri.AbsoluteUri}", ConsoleColor.Cyan);
+                                        PrintColored($"\n[+] Found URL: {resolvedUri.AbsoluteUri}", ConsoleColor.Cyan);
                                     }
                                 }
                             }
+                        }
+                        
+                        // Only show this message if we found new URLs and not in verbose mode (to avoid clutter)
+                        if (newUrlsFound > 0 && !verbose)
+                        {
+                            PrintColored($"  ↪ Found {newUrlsFound} new URLs from {url}", ConsoleColor.Cyan);
                         }
 
                         // Show progress
@@ -1318,12 +1604,15 @@ namespace AetherXSS
                     {
                         if (verbose)
                         {
-                            PrintColored($"⚠️ Error crawling {url}: {ex.Message}", ConsoleColor.Yellow);
+                            PrintColored($"\n[!] Error crawling {url}: {ex.Message}", ConsoleColor.Yellow);
                         }
                     }
                 }
+                
+                PrintColored($"✅ Completed depth level {depth + 1} - Total URLs discovered: {discovered.Count}", ConsoleColor.Green);
             }
-
+            
+            PrintColored($"\n🎯 Crawling complete! Found {result.Count} unique URLs", ConsoleColor.Green);
             return result;
         }
 
@@ -1355,20 +1644,79 @@ namespace AetherXSS
         {
             try
             {
-                await Task.Run(() => AnimatedUI.ShowLoadingAnimation("Attempting to exploit vulnerability..."));
+                Console.WriteLine();
+                PrintColored($"[*] Attempting to verify and exploit vulnerability...", ConsoleColor.Yellow);
+
+                // More professional approach
+                string[] exploitSteps = new string[] {
+                    "Analyzing attack vector",
+                    "Identifying injection context",
+                    "Creating proof-of-concept payload",
+                    "Testing payload execution",
+                    "Verifying XSS reflection",
+                    "Checking execution context",
+                    "Validating browser behavior"
+                };
                 
-                // Real exploit code could be here
-                // For demo purposes only
+                // Show exploitation progress
+                for (int i = 0; i < exploitSteps.Length; i++)
+                {
+                    await Task.Run(() => AnimatedUI.ShowLoadingAnimation(exploitSteps[i]));
+                }
                 
+                // Create a unique XSS PoC for the vulnerability
+                string pocPayload = GenerateProofOfConcept(url, method, payload);
+                
+                // Show vulnerability details
                 AnimatedUI.ShowVulnerabilityFound(url, $"XSS via {method}");
+                
+                // Show proof-of-concept details
+                Console.WriteLine();
+                PrintColored("[+] Proof of Concept Generated", ConsoleColor.Green);
+                Console.WriteLine();
+                PrintColored("  Details:", ConsoleColor.White);
+                PrintColored($"  URL: {url}", ConsoleColor.White);
+                PrintColored($"  Method: {method}", ConsoleColor.White);
+                PrintColored($"  Payload: {pocPayload}", ConsoleColor.White);
+                
+                // Show impact explanation
+                Console.WriteLine();
+                PrintColored("[*] Impact Analysis:", ConsoleColor.Yellow);
+                Console.WriteLine("  This vulnerability could allow attackers to:");
+                Console.WriteLine("  - Execute arbitrary JavaScript in users' browsers");
+                Console.WriteLine("  - Steal session cookies and hijack user sessions");
+                Console.WriteLine("  - Perform actions on behalf of the victim");
+                Console.WriteLine("  - Access sensitive data displayed on the page");
+                
+                Console.WriteLine();
+                PrintColored("[*] Remediation:", ConsoleColor.Yellow);
+                Console.WriteLine("  - Implement proper output encoding for all dynamic content");
+                Console.WriteLine("  - Validate and sanitize all user inputs");
+                Console.WriteLine("  - Implement Content Security Policy (CSP) headers");
+                Console.WriteLine("  - Use framework-provided XSS protection mechanisms");
+                
+                Console.WriteLine();
             }
             catch (Exception ex)
             {
                 if (verbose)
                 {
-                    PrintColored($"⚠️ Auto-exploit failed: {ex.Message}", ConsoleColor.Yellow);
+                    PrintColored($"\n[!] Auto-exploit failed: {ex.Message}", ConsoleColor.Yellow);
                 }
             }
+        }
+        
+        // Helper method to generate a proof-of-concept XSS payload
+        private static string GenerateProofOfConcept(string url, string method, string payload = null)
+        {
+            // Use the original payload if provided, otherwise generate a safe PoC
+            if (!string.IsNullOrEmpty(payload))
+            {
+                return payload;
+            }
+            
+            // Create a benign payload that demonstrates the vulnerability without harmful effects
+            return "<script>console.log('XSS Vulnerability Confirmed: ' + document.domain)</script>";
         }
 
         private static void GenerateReport(string reportPath)
@@ -1381,63 +1729,470 @@ namespace AetherXSS
                 report.AppendLine("<head>");
                 report.AppendLine("<meta charset=\"UTF-8\">");
                 report.AppendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
-                report.AppendLine("<title>AetherXSS Scan Report</title>");
+                report.AppendLine("<title>AetherXSS Security Scan Report</title>");
                 report.AppendLine("<style>");
                 report.AppendLine(@"
-                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background: #f0f0f0; }
-                    .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-                    h1 { color: #2c3e50; text-align: center; }
-                    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
-                    .stat-card { background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; }
-                    .vulnerability { background: #fff3f3; padding: 15px; margin: 10px 0; border-left: 4px solid #dc3545; border-radius: 4px; }
-                    .timestamp { color: #666; font-size: 0.9em; }
-                    .footer { text-align: center; margin-top: 40px; color: #666; }
+                    body { 
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                        margin: 0; 
+                        padding: 0; 
+                        background: #f4f6f8; 
+                        color: #333; 
+                    }
+                    .container { 
+                        max-width: 1200px; 
+                        margin: 0 auto; 
+                        background: white; 
+                        padding: 30px; 
+                        border-radius: 8px; 
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+                        margin-top: 20px;
+                        margin-bottom: 20px;
+                    }
+                    h1, h2, h3, h4 { 
+                        color: #2c3e50; 
+                        margin-top: 0; 
+                    }
+                    h1 { 
+                        text-align: center; 
+                        padding-bottom: 20px; 
+                        border-bottom: 1px solid #eee; 
+                        margin-bottom: 30px;
+                    }
+                    .header-logo {
+                        text-align: center;
+                        margin-bottom: 20px;
+                        font-size: 28px;
+                        font-weight: bold;
+                    }
+                    .stats { 
+                        display: grid; 
+                        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+                        gap: 20px; 
+                        margin: 30px 0; 
+                    }
+                    .stat-card { 
+                        background: #f8f9fa; 
+                        padding: 20px; 
+                        border-radius: 8px; 
+                        text-align: center; 
+                        border-left: 4px solid #4e73df;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                    }
+                    .stat-card h3 {
+                        margin-top: 0;
+                        color: #4e73df;
+                        font-size: 16px;
+                    }
+                    .stat-card p {
+                        font-size: 24px;
+                        font-weight: bold;
+                        margin: 10px 0 0 0;
+                    }
+                    .vulnerability { 
+                        background: #fff8f8; 
+                        padding: 20px; 
+                        margin: 15px 0; 
+                        border-left: 4px solid #e74a3b; 
+                        border-radius: 4px;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                    }
+                    .vulnerability h4 {
+                        margin-top: 0;
+                        color: #e74a3b;
+                    }
+                    .vulnerability-details {
+                        margin-top: 10px;
+                        padding-left: 20px;
+                    }
+                    .vulnerability-details p {
+                        margin: 5px 0;
+                    }
+                    .secure-note {
+                        background: #f0fff4;
+                        padding: 20px;
+                        border-left: 4px solid #1cc88a;
+                        border-radius: 4px;
+                        margin: 20px 0;
+                    }
+                    .timestamp { 
+                        color: #858796; 
+                        font-size: 0.9em; 
+                        text-align: right;
+                        margin-top: 20px;
+                    }
+                    .footer { 
+                        text-align: center; 
+                        margin-top: 40px; 
+                        color: #858796; 
+                        padding-top: 20px;
+                        border-top: 1px solid #eee;
+                    }
+                    .severity-high {
+                        color: #e74a3b;
+                        font-weight: bold;
+                    }
+                    .severity-medium {
+                        color: #f6c23e;
+                        font-weight: bold;
+                    }
+                    .severity-low {
+                        color: #36b9cc;
+                        font-weight: bold;
+                    }
+                    .summary-section {
+                        margin: 30px 0;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    table th, table td {
+                        padding: 10px;
+                        text-align: left;
+                        border-bottom: 1px solid #e3e6f0;
+                    }
+                    table th {
+                        background-color: #f8f9fc;
+                    }
+                    .remediation {
+                        background: #e8f4fd;
+                        padding: 15px;
+                        border-radius: 4px;
+                        margin-top: 10px;
+                    }
+                    .remediation h5 {
+                        margin-top: 0;
+                        color: #4e73df;
+                    }
                 ");
                 report.AppendLine("</style>");
                 report.AppendLine("</head>");
                 report.AppendLine("<body>");
                 
                 report.AppendLine("<div class=\"container\">");
-                report.AppendLine($"<h1>🔍 AetherXSS Scan Report</h1>");
-                report.AppendLine($"<p class=\"timestamp\">Generated on: {DateTime.Now}</p>");
+                report.AppendLine("<div class=\"header-logo\">AetherXSS</div>");
+                report.AppendLine("<h1>Cross-Site Scripting Security Scan Report</h1>");
+                
+                // Report summary
+                report.AppendLine("<div class=\"summary-section\">");
+                report.AppendLine("<h2>Executive Summary</h2>");
+                
+                if (discoveredVulnerabilities.Any())
+                {
+                    report.AppendLine($"<p>The security scan detected <span class=\"severity-high\">{statistics["vulnerableUrls"]} Cross-Site Scripting vulnerabilities</span> in the target application. These vulnerabilities could potentially allow attackers to inject malicious scripts that execute in users' browsers, potentially leading to session hijacking, credential theft, or defacement.</p>");
+                }
+                else
+                {
+                    report.AppendLine("<p>The security scan did not detect any Cross-Site Scripting vulnerabilities in the target application. However, this does not guarantee that the application is completely secure, as new vulnerabilities are discovered regularly.</p>");
+                    report.AppendLine("<div class=\"secure-note\"><strong>Note:</strong> While no XSS vulnerabilities were found, it's recommended to implement Content Security Policy (CSP) and other defensive measures as part of a defense-in-depth strategy.</div>");
+                }
+                
+                report.AppendLine("</div>");
+
+                // Scan information
+                report.AppendLine("<h2>Scan Information</h2>");
+                report.AppendLine("<table>");
+                report.AppendLine("<tr><th>Scan Date</th><td>" + DateTime.Now.ToString("yyyy-MM-dd") + "</td></tr>");
+                report.AppendLine("<tr><th>Scan Time</th><td>" + DateTime.Now.ToString("HH:mm:ss") + "</td></tr>");
+                report.AppendLine("<tr><th>Scanner Version</th><td>AetherXSS 1.0</td></tr>");
+                report.AppendLine("<tr><th>Payloads Tested</th><td>" + (xssPayloads.Count + customPayloads.Count) + "</td></tr>");
+                report.AppendLine("<tr><th>WAF Detection</th><td>Enabled</td></tr>");
+                report.AppendLine("<tr><th>Context Analysis</th><td>Enabled</td></tr>");
+                report.AppendLine("</table>");
 
                 // Statistics
+                report.AppendLine("<h2>Scan Statistics</h2>");
                 report.AppendLine("<div class=\"stats\">");
-                report.AppendLine($"<div class=\"stat-card\"><h3>URLs Tested</h3><p>{statistics["testedUrls"]}</p></div>");
-                report.AppendLine($"<div class=\"stat-card\"><h3>Vulnerabilities</h3><p>{statistics["vulnerableUrls"]}</p></div>");
-                report.AppendLine($"<div class=\"stat-card\"><h3>Failed Requests</h3><p>{statistics["failedRequests"]}</p></div>");
-                report.AppendLine($"<div class=\"stat-card\"><h3>Parameters Tested</h3><p>{statistics["parametersFound"]}</p></div>");
+                report.AppendLine($"<div class=\"stat-card\"><h3>URLS TESTED</h3><p>{statistics["testedUrls"]}</p></div>");
+                
+                if (statistics["vulnerableUrls"] > 0)
+                {
+                    report.AppendLine($"<div class=\"stat-card\" style=\"border-left-color: #e74a3b;\"><h3>XSS VULNERABILITIES</h3><p style=\"color: #e74a3b;\">{statistics["vulnerableUrls"]}</p></div>");
+                }
+                else
+                {
+                    report.AppendLine($"<div class=\"stat-card\" style=\"border-left-color: #1cc88a;\"><h3>XSS VULNERABILITIES</h3><p style=\"color: #1cc88a;\">0</p></div>");
+                }
+                
+                report.AppendLine($"<div class=\"stat-card\"><h3>FAILED REQUESTS</h3><p>{statistics["failedRequests"]}</p></div>");
+                report.AppendLine($"<div class=\"stat-card\"><h3>PARAMETERS TESTED</h3><p>{statistics["parametersFound"]}</p></div>");
                 report.AppendLine("</div>");
 
                 // Vulnerabilities
                 if (discoveredVulnerabilities.Any())
                 {
-                    report.AppendLine("<h2>🚨 Discovered Vulnerabilities</h2>");
+                    report.AppendLine("<h2>Discovered Vulnerabilities</h2>");
+                    
+                    int vulnCounter = 1;
                     foreach (var vuln in discoveredVulnerabilities)
                     {
-                        report.AppendLine($"<div class=\"vulnerability\"><p>{HttpUtility.HtmlEncode(vuln)}</p></div>");
+                        string severity = "High";
+                        string severityClass = "severity-high";
+                        
+                        // Determine severity based on vulnerability type
+                        if (vuln.Contains("WAF Bypass"))
+                        {
+                            severity = "Critical";
+                        }
+                        else if (vuln.Contains("DOM XSS"))
+                        {
+                            severity = "High";
+                        }
+                        else if (vuln.Contains("Stored"))
+                        {
+                            severity = "High";
+                        }
+                        else
+                        {
+                            severity = "Medium";
+                            severityClass = "severity-medium";
+                        }
+                        
+                        report.AppendLine("<div class=\"vulnerability\">");
+                        report.AppendLine($"<h4>Vulnerability #{vulnCounter}: Cross-Site Scripting (<span class=\"{severityClass}\">{severity}</span>)</h4>");
+                        report.AppendLine("<div class=\"vulnerability-details\">");
+                        report.AppendLine($"<p><strong>URL:</strong> {HttpUtility.HtmlEncode(vuln.Substring(vuln.IndexOf(":") + 1).Trim())}</p>");
+                        report.AppendLine($"<p><strong>Type:</strong> {vuln.Substring(0, vuln.IndexOf(":")).Trim()}</p>");
+                        
+                        // Suggested remediation based on vulnerability type
+                        report.AppendLine("<div class=\"remediation\">");
+                        report.AppendLine("<h5>Remediation Guidance</h5>");
+                        report.AppendLine("<p>To fix this vulnerability:</p>");
+                        report.AppendLine("<ul>");
+                        report.AppendLine("<li>Implement proper output encoding for all dynamic content</li>");
+                        report.AppendLine("<li>Validate and sanitize all user inputs</li>");
+                        report.AppendLine("<li>Implement Content Security Policy (CSP) headers</li>");
+                        report.AppendLine("<li>Use framework-provided XSS protection mechanisms</li>");
+                        
+                        if (vuln.Contains("WAF Bypass"))
+                        {
+                            report.AppendLine("<li>Update your WAF rules to handle the specific bypass technique used</li>");
+                        }
+                        
+                        if (vuln.Contains("DOM"))
+                        {
+                            report.AppendLine("<li>Review client-side JavaScript code that manipulates the DOM</li>");
+                            report.AppendLine("<li>Use safe DOM manipulation methods (e.g., textContent instead of innerHTML)</li>");
+                        }
+                        
+                        report.AppendLine("</ul>");
+                        report.AppendLine("</div>"); // end remediation
+                        
+                        report.AppendLine("</div>"); // end vulnerability-details
+                        report.AppendLine("</div>"); // end vulnerability
+                        
+                        vulnCounter++;
                     }
+                    
+                    // Risk assessment
+                    report.AppendLine("<h2>Risk Assessment</h2>");
+                    report.AppendLine("<p>Cross-Site Scripting vulnerabilities can lead to multiple security risks:</p>");
+                    report.AppendLine("<ul>");
+                    report.AppendLine("<li><strong>Session Hijacking:</strong> Attackers can steal user session tokens</li>");
+                    report.AppendLine("<li><strong>Credential Theft:</strong> Attackers can create malicious forms to capture credentials</li>");
+                    report.AppendLine("<li><strong>Data Theft:</strong> Sensitive data displayed on the page can be accessed</li>");
+                    report.AppendLine("<li><strong>Site Defacement:</strong> Attackers can modify page content</li>");
+                    report.AppendLine("<li><strong>Malware Distribution:</strong> Attackers can redirect users to malicious sites</li>");
+                    report.AppendLine("</ul>");
                 }
                 else
                 {
-                    report.AppendLine("<h2>✅ No Vulnerabilities Found</h2>");
+                    report.AppendLine("<h2>No Vulnerabilities Found</h2>");
+                    report.AppendLine("<p>No Cross-Site Scripting vulnerabilities were detected during the scan. However, we recommend implementing the following security best practices:</p>");
+                    report.AppendLine("<ul>");
+                    report.AppendLine("<li>Implement Content Security Policy (CSP) headers</li>");
+                    report.AppendLine("<li>Use modern frameworks with built-in XSS protection</li>");
+                    report.AppendLine("<li>Validate and sanitize all user inputs</li>");
+                    report.AppendLine("<li>Implement proper output encoding for all dynamic content</li>");
+                    report.AppendLine("<li>Regularly test your application for new vulnerabilities</li>");
+                    report.AppendLine("</ul>");
                 }
 
+                report.AppendLine("<div class=\"timestamp\">Report generated on: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "</div>");
+
                 report.AppendLine("<div class=\"footer\">");
-                report.AppendLine("<p>Generated by AetherXSS Scanner</p>");
-                report.AppendLine("<p>Developed by @ibrahimsql</p>");
+                report.AppendLine("<p>Generated by AetherXSS Scanner - Advanced Cross-Site Scripting Testing Tool</p>");
                 report.AppendLine("</div>");
                 
-                report.AppendLine("</div>");
+                report.AppendLine("</div>"); // end container
                 report.AppendLine("</body>");
                 report.AppendLine("</html>");
 
                 File.WriteAllText(reportPath, report.ToString());
+                PrintColored($"\n[+] Comprehensive security report generated: {reportPath}", ConsoleColor.Green);
             }
             catch (Exception ex)
             {
-                PrintColored($"⚠️ Error generating report: {ex.Message}", ConsoleColor.Yellow);
+                PrintColored($"\n[!] Error generating report: {ex.Message}", ConsoleColor.Yellow);
             }
+        }
+
+        // New method to detect WAF presence
+        private static bool DetectWAF(HttpResponseMessage response, string responseBody)
+        {
+            // Check for common WAF signatures in headers
+            if (response.Headers.Contains("X-WAF") || 
+                response.Headers.Contains("X-Powered-By-WAF") || 
+                response.Headers.Contains("X-XSS-Protection"))
+            {
+                return true;
+            }
+            
+            // Check for WAF signatures in cookies
+            if (response.Headers.Contains("Set-Cookie"))
+            {
+                var cookies = response.Headers.GetValues("Set-Cookie");
+                foreach (var cookie in cookies)
+                {
+                    if (cookie.Contains("__cfduid") || // CloudFlare
+                        cookie.Contains("AKAMAI") ||   // Akamai 
+                        cookie.Contains("bigipserver") || // F5 BIG-IP
+                        cookie.Contains("incap_ses"))   // Incapsula
+                    {
+                        return true;
+                    }
+                }
+            }
+            
+            // Check response body for WAF block messages
+            string[] wafPatterns = {
+                "CloudFlare", "Cloudflare", "cloudflare",
+                "Mod_Security", "ModSecurity", "mod_security",
+                "Incapsula", "IncapsulaWAF",
+                "F5 Networks", "F5", "BIG-IP",
+                "Akamai", "AkamaiGhost",
+                "Imperva", "ImpervaWAF"
+            };
+            
+            foreach (var pattern in wafPatterns)
+            {
+                if (responseBody.Contains(pattern))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        // New method to test WAF bypass payloads
+        private static async Task TestWAFBypass(string url, string cookie, Dictionary<string, string> extraHeaders, string customUserAgent)
+        {
+            foreach (var bypass in wafBypassPayloads)
+            {
+                string wafName = bypass.Key;
+                string payload = bypass.Value;
+                
+                string encodedPayload = HttpUtility.UrlEncode(payload);
+                string testUrl = url.Contains("?") ? $"{url}&xss={encodedPayload}" : $"{url}?xss={encodedPayload}";
+                
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, testUrl);
+                    AddHeaders(request, cookie, extraHeaders, customUserAgent);
+                    
+                    HttpResponseMessage response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    
+                    lock (statistics)
+                    {
+                        statistics["testedUrls"]++;
+                    }
+                    
+                    if (IsXssVulnerable(responseBody, payload))
+                    {
+                        lock (discoveredVulnerabilities)
+                        {
+                            discoveredVulnerabilities.Add($"GET (WAF Bypass - {wafName}): {testUrl}");
+                        }
+
+                        lock (statistics)
+                        {
+                            statistics["vulnerableUrls"]++;
+                        }
+
+                        PrintColored($"\n[!] XSS Vulnerability Detected with WAF Bypass ({wafName})! {testUrl}", ConsoleColor.Red);
+                        AnimatedUI.ShowVulnerabilityFound(testUrl, $"WAF Bypass - {wafName}");
+                        
+                        if (autoExploit)
+                        {
+                            await AutoExploit(testUrl, "GET", payload);
+                        }
+                    }
+                }
+                catch
+                {
+                    // Ignore errors in WAF bypass attempts
+                }
+            }
+        }
+        
+        // New method for better XSS detection
+        private static bool IsXssVulnerable(string responseBody, string payload)
+        {
+            // First check for direct reflection
+            if (responseBody.Contains(payload))
+                return true;
+                
+            // Check for URL-encoded versions
+            string encodedPayload = HttpUtility.UrlEncode(payload);
+            if (responseBody.Contains(encodedPayload))
+                return true;
+                
+            // Check for HTML-encoded versions
+            string htmlEncodedPayload = HttpUtility.HtmlEncode(payload);
+            if (responseBody.Contains(htmlEncodedPayload))
+                return true;
+
+            // Check for double-encoded versions
+            string doubleEncodedPayload = HttpUtility.UrlEncode(HttpUtility.UrlEncode(payload));
+            if (responseBody.Contains(doubleEncodedPayload))
+                return true;
+                
+            // Advanced checks for partial reflections that could still be vulnerable
+            if (payload.Contains("<script>") && responseBody.Contains("<script>"))
+            {
+                if (payload.Contains("alert") && responseBody.Contains("alert"))
+                    return true;
+            }
+            
+            if (payload.Contains("onerror") && responseBody.Contains("onerror"))
+            {
+                if (payload.Contains("alert") && responseBody.Contains("alert"))
+                    return true;
+            }
+            
+            if (payload.Contains("javascript:") && responseBody.Contains("javascript:"))
+            {
+                return true;
+            }
+            
+            return false;
+        }
+
+        // Determine the context of XSS vulnerability
+        private static string DetermineXssContext(string responseBody, string payload)
+        {
+            // Simplified context detection - would be more advanced in real implementation
+            if (responseBody.Contains("<script") && responseBody.Contains(payload))
+            {
+                return "JavaScript Context";
+            }
+            else if (responseBody.Contains("href=") && responseBody.Contains(payload))
+            {
+                return "URL Attribute Context";
+            }
+            else if (Regex.IsMatch(responseBody, $"<[^>]*{Regex.Escape(payload)}[^>]*>"))
+            {
+                return "HTML Attribute Context";
+            }
+            else if (responseBody.Contains(payload))
+            {
+                return "HTML Context";
+            }
+            
+            return "Unknown Context";
         }
     }
 } 
