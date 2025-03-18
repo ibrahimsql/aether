@@ -85,6 +85,13 @@ Options:
 - Consider using proxy for anonymity
 - Review and customize payloads before use
 
+
+
+![screenshot](https://github.com/user-attachments/assets/5d8b7009-f72e-4a98-b2a3-047fbf3eedc5)
+
+
+
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
