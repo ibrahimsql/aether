@@ -2444,29 +2444,135 @@ namespace AetherXSS
             Console.WriteLine();
         }
 
-        public static void ShowVulnerabilityFound(string url, string type)
+        public static void ShowVulnerabilityFound(
+            string url, 
+            string type,
+            string severity = "Medium",
+            string description = "",
+            string solution = "",
+            string[] affectedParameters = null,
+            double cvssScore = 0.0,
+            string[] affectedTechnologies = null,
+            string httpMethod = "GET",
+            string[] payloadExamples = null,
+            string cveReference = "",
+            int riskPercentage = 0,
+            DateTime? detectionTime = null)
         {
-            Console.WriteLine();
+            // Set color based on severity
+            ConsoleColor severityColor = severity.ToLower() switch
+            {
+                "critical" => ConsoleColor.DarkRed,
+                "high" => ConsoleColor.Red,
+                "medium" => ConsoleColor.Yellow,
+                "low" => ConsoleColor.Green,
+                _ => ConsoleColor.White
+            };
+
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("═════════════════════════════════════════════");
-            Console.WriteLine("  VULNERABILITY DETECTED");
-            Console.WriteLine("═════════════════════════════════════════════");
+            Console.WriteLine("\n═════════════════════════════════════════════");
+            Console.WriteLine("  VULNERABILITY FOUND!");
             Console.WriteLine($"  Type: {type}");
             Console.WriteLine($"  URL: {url}");
+            
+            Console.ForegroundColor = severityColor;
+            Console.WriteLine($"  Severity: {severity}");
+            
+            if (cvssScore > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine($"  CVSS Score: {cvssScore:F1}/10.0");
+            }
+            
+            if (riskPercentage > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.Write("  Risk Level: [");
+                int filled = riskPercentage / 10;
+                for (int i = 0; i < 10; i++)
+                {
+                    Console.Write(i < filled ? "█" : "░");
+                }
+                Console.WriteLine($"] {riskPercentage}%");
+            }
+            
+            if (!string.IsNullOrEmpty(description))
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine($"  Description: {description}");
+            }
+            
+            if (!string.IsNullOrEmpty(solution))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"  Solution: {solution}");
+            }
+            
+            if (affectedParameters != null && affectedParameters.Length > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("  Affected Parameters:");
+                foreach (var param in affectedParameters)
+                {
+                    Console.WriteLine($"    - {param}");
+                }
+            }
+
+            if (affectedTechnologies != null && affectedTechnologies.Length > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine("  Affected Technologies:");
+                foreach (var tech in affectedTechnologies)
+                {
+                    Console.WriteLine($"    - {tech}");
+                }
+            }
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"  HTTP Method: {httpMethod}");
+
+            if (payloadExamples != null && payloadExamples.Length > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine("  Payload Examples:");
+                foreach (var payload in payloadExamples)
+                {
+                    Console.WriteLine($"    - {payload}");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(cveReference))
+            {
+                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                Console.WriteLine($"  CVE Reference: {cveReference}");
+            }
+
+            if (detectionTime.HasValue)
+            {
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine($"  Detected: {detectionTime.Value:yyyy-MM-dd HH:mm:ss}");
+            }
+            
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("═════════════════════════════════════════════");
             Console.ResetColor();
             
-            // Play alert sound only on Windows
-            if (OperatingSystem.IsWindows())
+            // Platform independent sound notification
+            try
             {
-                try
+                if (OperatingSystem.IsWindows())
                 {
                     Console.Beep(800, 200);
                 }
-                catch
+                else if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
                 {
-                    // Ignore any errors if beep fails
+                    // Use system bell character
+                    Console.Write("\a");
                 }
+            }
+            catch
+            {
+                // Ignore any errors if sound notification fails
             }
         }
     }
