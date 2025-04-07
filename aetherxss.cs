@@ -2557,7 +2557,7 @@ namespace AetherXSS
             Console.WriteLine("═════════════════════════════════════════════");
             Console.ResetColor();
             
-            // Platform independent sound notification
+            // Platform independent sound notification(macOS Linux etc.)
             try
             {
                 if (OperatingSystem.IsWindows())
