@@ -14,6 +14,10 @@ Advanced Cross-Site Scripting Scanner with Docker Integration
 - 🔒 Custom payload support
 - 🌐 Proxy support
 - 📝 Verbose logging
+- 📊 HTML & JSON reports
+- ⚔️ Auto-exploitation
+- 🧪 DOM-based XSS
+
 
 ## Quick Start with Docker
 
@@ -39,20 +43,26 @@ dotnet run -- --url https://target.com
 
 ```bash
 AetherXSS --url <target_url> [options]
-
-Options:
   --url <url>              Target URL to scan (required)
   --no-color               Disable colored output
   --proxy <proxy_url>      Use proxy for requests
   --cookie <cookie_data>   Use custom cookies
   --headers <h1:v1,...>    Use custom HTTP headers
+  --user-agent <ua>        Use specific User-Agent
+  --wordlist <file>        Load custom payload list
   --threads <num>          Number of concurrent threads (default: 5)
-  --delay <ms>            Delay between requests in milliseconds
-  --timeout <sec>         Request timeout in seconds (default: 30)
-  --output <file>         Save results to file
-  --verbose               Show detailed output
-  --crawl                 Enable web crawling
-  --depth <num>           Crawling depth (default: 2)
+  --delay <ms>             Delay between requests (milliseconds)
+  --timeout <sec>          Request timeout (seconds) (default: 30)
+  --output <file>          Save results to file
+  --verbose                Show detailed output
+  --dom-scan               Enable DOM-based XSS scanning
+  --crawl                  Crawl website for additional URLs
+  --depth <num>            Crawl depth (default: 2)
+  --params                 Test common parameter names
+  --methods                Test different HTTP methods
+  --fuzz-headers           Fuzz HTTP headers for XSS
+  --auto-exploit           Attempt to automatically exploit found vulnerabilities
+  --help                   Show this help message
 ```
 
 ## Directory Structure
@@ -90,6 +100,17 @@ Options:
 ![screenshot](https://github.com/user-attachments/assets/5d8b7009-f72e-4a98-b2a3-047fbf3eedc5)
 
 
+## 🫂Contributing
+
+Contributions are welcome! Here's how you can help:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please make sure to update tests as appropriate.
 
 
 ## License
@@ -99,4 +120,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Author
 
 - [@ibrahimsql](https://github.com/ibrahimsql)
-- Email: ibrahimsql@proton.me 
+- Email: ibrahimsql@proton.me
+
