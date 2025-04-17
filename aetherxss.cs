@@ -16,7 +16,7 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using System.Xml;
 using AetherXSS;
-HttpClient client = null; // Initialize HttpClient variable to null
+HttpClient client = null;
 bool useColor = true;
 bool verbose = false;
 bool autoExploit = false;
@@ -844,7 +844,7 @@ try
                 }
                 await Task.WhenAll(payloadTasks);
 
-                // Diğer testler (DOM, parametre, content-type, framework, CSP) mevcut şekilde devam ediyor
+                // Other tests (DOM, parameter, content-type, framework, CSP) will continue as usual
                 if (domScanEnabled)
                 {
                     PrintColored($"[*] Scanning for DOM XSS on {url}...", ConsoleColor.Cyan);
