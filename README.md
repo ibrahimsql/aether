@@ -17,7 +17,11 @@ Advanced Cross-Site Scripting Scanner with Docker Integration
 - 📊 HTML & JSON reports
 - ⚔️ Auto-exploitation
 - 🧪 DOM-based XSS
-
+- 🕵️‍♂️ Blind XSS 
+- 🧩 Framework-Specific
+- 🛡️ WAF Detection & Bypass 
+- 🕸️ Parameter Discovery 
+- 🔄 CSP Analysis & Bypass 
 
 ## Quick Start with Docker
 
@@ -43,26 +47,30 @@ dotnet run -- --url https://target.com
 
 ```bash
 AetherXSS --url <target_url> [options]
-  --url <url>              Target URL to scan (required)
-  --no-color               Disable colored output
-  --proxy <proxy_url>      Use proxy for requests
-  --cookie <cookie_data>   Use custom cookies
-  --headers <h1:v1,...>    Use custom HTTP headers
-  --user-agent <ua>        Use specific User-Agent
-  --wordlist <file>        Load custom payload list
-  --threads <num>          Number of concurrent threads (default: 5)
-  --delay <ms>             Delay between requests (milliseconds)
-  --timeout <sec>          Request timeout (seconds) (default: 30)
-  --output <file>          Save results to file
-  --verbose                Show detailed output
-  --dom-scan               Enable DOM-based XSS scanning
-  --crawl                  Crawl website for additional URLs
-  --depth <num>            Crawl depth (default: 2)
-  --params                 Test common parameter names
-  --methods                Test different HTTP methods
-  --fuzz-headers           Fuzz HTTP headers for XSS
-  --auto-exploit           Attempt to automatically exploit found vulnerabilities
-  --help                   Show this help message
+  --url <url>                Target URL to scan (required)
+  --no-color                 Disable colored output
+  --proxy <proxy_url>        Use proxy for requests
+  --cookie <cookie_data>     Use custom cookies
+  --headers <h1:v1,...>      Use custom HTTP headers
+  --user-agent <ua>          Use specific User-Agent
+  --wordlist <file>          Load custom payload list
+  --threads <num>            Number of concurrent threads (default: 5)
+  --delay <ms>               Delay between requests (milliseconds)
+  --timeout <sec>            Request timeout (seconds) (default: 30)
+  --output <file>            Save results to file
+  --verbose                  Show detailed output
+  --dom-scan                 Enable DOM-based XSS scanning
+  --crawl                    Crawl website for additional URLs
+  --depth <num>              Crawl depth (default: 2)
+  --params                   Test common parameter names
+  --methods                  Test different HTTP methods
+  --fuzz-headers             Fuzz HTTP headers for XSS
+  --auto-exploit             Attempt to automatically exploit found vulnerabilities
+  --framework-specific       Enable Angular/React/Vue/jQuery payloads
+  --blind-xss                Enable Blind XSS testing
+  --blind-callback <url>     Callback URL for Blind XSS detection
+  --csp-analysis             Enable CSP analysis and bypass
+  --help                     Show this help message
 ```
 
 ## Directory Structure
@@ -117,8 +125,12 @@ Please make sure to update tests as appropriate.
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Author
+## 🤝 Developed by
+- 👨‍💻 Developed by: [@ibrahimsql](https://github.com/ibrahimsql)
+- 📧 Email: ibrahimsql@proton.me
+- 🌍 https://github.com/ibrahimsql
+- 🏆 Cyber Security Engineer | OSCP Candidate | Ethical Hacking Specialist | Penetration Testing Expert | Red Team & Security Research Professional | Passionate About Defending the Digital World
 
-- [@ibrahimsql](https://github.com/ibrahimsql)
-- Email: ibrahimsql@proton.me
 
+- ☕ Always fueled by coffee & curiosity!
+- 💬 Feel free to reach out for collaboration or just to say hi!
