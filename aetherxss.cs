@@ -947,10 +947,6 @@ try
     {
         PrintColored("\nVULNERABILITIES DETECTED! Review the scan results for details.", ConsoleColor.Red);
     }
-    else
-    {
-        PrintColored("\nNo vulnerabilities detected in this scan.", ConsoleColor.Green);
-    }
 
     // Tip message
     string[] tipMessages = new string[]
@@ -1628,7 +1624,6 @@ async Task<List<string>> CrawlWebsite(string startUrl, int maxDepth)
     Uri baseUri = new Uri(startUrl);
     string baseDomain = baseUri.Host;
 
-    Console.WriteLine();
     PrintColored($"[+] Starting web crawl from {startUrl}", ConsoleColor.Cyan);
     PrintColored($"[*] Looking for additional targets (max depth: {maxDepth})", ConsoleColor.Cyan);
     Console.WriteLine();
@@ -3489,52 +3484,6 @@ namespace AetherXSS
             Console.WriteLine("COMPLETE");
             
             Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        }
-
-        public static void PrintBanner()
-        {
-            string banner = @"
-    ▄▄▄     ▄▄▄█████▓ ██░ ██ ▓█████  ██▀███  ▒██   ██▒  ██████   ██████ 
-   ▒████▄   ▓  ██▒ ▓▒▓██░ ██▒▓█   ▀ ▓██ ▒ ██▒▒▒ █ █ ▒░▒██    ▒ ▒██    ▒ 
-   ▒██  ▀█▄ ▒ ▓██░ ▒░▒██▀▀██░▒███   ▓██ ░▄█ ▒░░  █   ░░ ▓██▄   ░ ▓██▄   
-   ░██▄▄▄▄██░ ▓██▓ ░ ░▓█ ░██ ▒▓█  ▄ ▒██▀▀█▄   ░ █ █ ▒   ▒   ██▒  ▒   ██▒
-    ▓█   ▓██▒ ▒██▒ ░ ░▓█▒░██▓░▒████▒░██▓ ▒██▒▒██▒ ▒██▒▒██████▒▒▒██████▒▒
-    ▒▒   ▓▒█░ ▒ ░░    ▒ ░░▒░▒░░ ▒░ ░░ ▒▓ ░▒▓░▒▒ ░ ░▓ ░▒ ▒▓▒ ▒ ░▒ ▒▓▒ ▒ ░";
-
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine(banner);
-            
-            Console.WriteLine("\nAetherXSS - Advanced Cross-Site Scripting Scanner");
-            Console.WriteLine("Developer: @ibrahimsql\n");
-            
-            Console.ResetColor();
-        }
-
-        public static void ShowScanningAnimation(string target)
-        {
-            string[] scanFrames = new string[]
-            {
-                $"[→] Scanning {target}"
-            };
-
-            string[] actionVerbs = new string[] { 
-                "Scanning", "Analyzing", "Processing", "Checking", "Examining" 
-            };
-            
-            Random r = new Random();
-            string verb = actionVerbs[r.Next(actionVerbs.Length)];
-
-            for (int i = 0; i < 8; i++)
-            {
-                string direction = "-\\|/"[i % 4].ToString();
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write($"\r[{direction}] {verb} ");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write(target);
-                Console.ResetColor();
-                Thread.Sleep(100);
-            }
-            Console.WriteLine();
         }
 
         public static void ShowVulnerabilityFound(

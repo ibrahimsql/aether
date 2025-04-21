@@ -14,7 +14,6 @@ Advanced Cross-Site Scripting Scanner with Docker Integration
 - 🔒 Custom payload support
 - 🌐 Proxy support
 - 📝 Verbose logging
-- 📊 HTML & JSON reports
 - ⚔️ Auto-exploitation
 - 🧪 DOM-based XSS
 - 🕵️‍♂️ Blind XSS 
@@ -130,7 +129,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 📧 Email: ibrahimsql@proton.me
 - 🌍 https://github.com/ibrahimsql
 - 🏆 Cyber Security Engineer | OSCP Candidate | Ethical Hacking Specialist | Penetration Testing Expert | Red Team & Security Research Professional | Passionate About Defending the Digital World
-
 
 - ☕ Always fueled by coffee & curiosity!
 - 💬 Feel free to reach out for collaboration or just to say hi!
