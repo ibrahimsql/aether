@@ -1,4 +1,4 @@
-module github.com/ibrahimsql/aetherxss
+module github.com/ibrahimsql/aether
 
 go 1.23.0
 
@@ -11,8 +11,7 @@ require (
 	github.com/chromedp/cdproto v0.0.0-20250403032234-65de8f5d025b
 	github.com/chromedp/chromedp v0.13.6
 	github.com/fatih/color v1.16.0
-	github.com/ibrahimsql/aetherxss/lib v0.0.0
-	github.com/ibrahimsql/volt v1.0.7
+	github.com/ibrahimsql/aether/lib v0.0.0
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mark3labs/mcp-go v0.23.0
@@ -72,3 +71,14 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/ibrahimsql/volt => /dev/null
+replace github.com/ibrahimsql/aether/lib => ./lib
+replace github.com/ibrahimsql/aether/internal/printing => ./internal/printing
+replace github.com/ibrahimsql/aether/internal/payload => ./internal/payload
+replace github.com/ibrahimsql/aether/internal/har => ./internal/har
+replace github.com/ibrahimsql/aether/internal/utils => ./internal/utils
+replace github.com/ibrahimsql/aether/internal/optimization => ./internal/optimization
+replace github.com/ibrahimsql/aether/pkg/model => ./pkg/model
+replace github.com/ibrahimsql/aether/pkg/scanning => ./pkg/scanning
+replace github.com/ibrahimsql/aether/pkg/server => ./pkg/server

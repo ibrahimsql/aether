@@ -10,9 +10,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ibrahimsql/aetherxss/v2/internal/har"
+	"github.com/ibrahimsql/aether/internal/har"
 
-	"github.com/ibrahimsql/aetherxss/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 // GenerateNewRequest is make http.Cilent

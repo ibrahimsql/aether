@@ -18,16 +18,16 @@ func TestAbstraction(t *testing.T) {
 		{
 			name: "inHTML-none",
 			args: args{
-				s:       "asdf<br><aetherxss>1234",
-				pibrahimsqload: "<aetherxss>",
+				s:       "asdf<br><aether>1234",
+				pibrahimsqload: "<aether>",
 			},
 			want: []string{"inHTML-none"},
 		},
 		{
 			name: "inJS-none",
 			args: args{
-				s:       "<script><aetherxss></script>",
-				pibrahimsqload: "<aetherxss>",
+				s:       "<script><aether></script>",
+				pibrahimsqload: "<aether>",
 			},
 			want: []string{"inJS-none"},
 		},
@@ -35,16 +35,16 @@ func TestAbstraction(t *testing.T) {
 		{
 			name: "inJS-double",
 			args: args{
-				s:       "<script>var a= \"<aetherxss>\"</script>",
-				pibrahimsqload: "<aetherxss>",
+				s:       "<script>var a= \"<aether>\"</script>",
+				pibrahimsqload: "<aether>",
 			},
 			want: []string{"inJS-double"},
 		},
 		{
 			name: "inJS-single",
 			args: args{
-				s:       "<script>var a = '<aetherxss>'</script>",
-				pibrahimsqload: "<aetherxss>",
+				s:       "<script>var a = '<aether>'</script>",
+				pibrahimsqload: "<aether>",
 			},
 			want: []string{"inJS-single"},
 		},
@@ -52,32 +52,32 @@ func TestAbstraction(t *testing.T) {
 		{
 			name: "inJS-backtick",
 			args: args{
-				s:       "<script>`<aetherxss>`</script>",
-				pibrahimsqload: "<aetherxss>",
+				s:       "<script>`<aether>`</script>",
+				pibrahimsqload: "<aether>",
 			},
 			want: []string{"inJS-backtick"},
 		},
 		{
 			name: "inATTR-none",
 			args: args{
-				s:       "<a href=aetherxss>zzz</a>",
-				pibrahimsqload: "aetherxss",
+				s:       "<a href=aether>zzz</a>",
+				pibrahimsqload: "aether",
 			},
 			want: []string{"inATTR-none"},
 		},
 		{
 			name: "inATTR-double",
 			args: args{
-				s:       "<a href=\"aetherxss\">zzz</a>",
-				pibrahimsqload: "aetherxss",
+				s:       "<a href=\"aether\">zzz</a>",
+				pibrahimsqload: "aether",
 			},
 			want: []string{"inATTR-double"},
 		},
 		{
 			name: "inATTR-single",
 			args: args{
-				s:       "<a href='aetherxss'>zzz</a>",
-				pibrahimsqload: "aetherxss",
+				s:       "<a href='aether'>zzz</a>",
+				pibrahimsqload: "aether",
 			},
 			want: []string{"inATTR-single"},
 		},

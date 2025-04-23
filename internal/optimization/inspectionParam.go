@@ -1,7 +1,7 @@
 package optimization
 
 import (
-	"github.com/hahwul/dalfox/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 // CheckInspectionParam is Checking Inspection

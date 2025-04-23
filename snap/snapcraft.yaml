@@ -1,5 +1,5 @@
 ---
-name: aetherxss
+name: aether
 summary: Powerful open-source XSS scanner and utility focused on automation.
 description: |
   Dalfox is a powerful open-source tool that focuses on automation, making it ideal for quickly scanning for XSS flaws and analyzing parameters.
@@ -11,17 +11,17 @@ license: MIT
 version: v2.11.0
 
 apps:
-  aetherxss:
-    command: aetherxss
+  aether:
+    command: aether
     plugs: [home, network, network-bind]
 parts:
-  aetherxss:
-    source: https://github.com/ibrahimsql/aetherxss.git
+  aether:
+    source: https://github.com/ibrahimsql/aether.git
     source-type: git
     plugin: go
     build-snaps: [go]
     build-packages: [build-essential]
     override-build: |
       go build .
-      cp ./aetherxss $SNAPCRAFT_PART_INSTALL/
+      cp ./aether $SNAPCRAFT_PART_INSTALL/
       snapcraftctl build

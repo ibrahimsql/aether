@@ -4,8 +4,8 @@ package lib
 import (
 	"time"
 
-	"github.com/hahwul/dalfox/v2/pkg/model"
-	"github.com/hahwul/dalfox/v2/pkg/scanning"
+	"github.com/ibrahimsql/aether/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/scanning"
 	"github.com/logrusorgru/aurora"
 )
 
@@ -207,7 +207,7 @@ func Initialize(target Target, options Options) model.Options {
 	return newOptions
 }
 
-// NewScan is dalfox single scan in lib
+// NewScan is aether single scan in lib
 func NewScan(target Target) (Result, error) {
 	newOptions := Initialize(target, target.Options)
 	modelResult, err := scanning.Scan(target.URL, newOptions, "Single")

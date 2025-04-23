@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/ibrahimsql/aetherxss/internal/printing"
+	"github.com/ibrahimsql/aether/internal/printing"
 	"github.com/spf13/cobra"
 )
 

@@ -13,7 +13,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ibrahimsql/aetherxss/modules/payloads"
+	"github.com/ibrahimsql/aether/modules/payloads"
 )
 
 // ReadResponseBody reads the response body and returns it as a string

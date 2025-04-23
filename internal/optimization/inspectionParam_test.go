@@ -3,7 +3,7 @@ package optimization
 import (
 	"testing"
 
-	"github.com/hahwul/dalfox/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 func Test_CheckInspectionParam(t *testing.T) {

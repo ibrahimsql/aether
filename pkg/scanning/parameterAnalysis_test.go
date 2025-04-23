@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hahwul/dalfox/v2/internal/payload"
-	"github.com/hahwul/dalfox/v2/internal/printing"
-	"github.com/hahwul/dalfox/v2/pkg/model"
+	"github.com/ibrahimsql/aether/internal/payload"
+	"github.com/ibrahimsql/aether/internal/printing"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 // Function variables for mocking
@@ -283,7 +283,7 @@ func TestParameterAnalysis(t *testing.T) {
 	// Setup test server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("test") != "" {
-			w.Write([]byte("<html><body>Reflected: Dalfox</body></html>"))
+			w.Write([]byte("<html><body>Reflected: Aether</body></html>"))
 			return
 		}
 		w.Write([]byte("<html><body>Not found</body></html>"))
@@ -308,7 +308,7 @@ func TestParameterAnalysis(t *testing.T) {
 	}
 	rl := newRateLimiter(time.Duration(0))
 
-	target := ts.URL + "?test=aaa" // Changed from "value" to "Dalfox" to match server logic
+	target := ts.URL + "?test=aaa" // Changed from "value" to "Aether" to match server logic
 	results := ParameterAnalysis(target, options, rl)
 
 	// Verify that the "test" parameter was found and marked as reflected

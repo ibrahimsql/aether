@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/ibrahimsql/aetherxss/modules/config"
-	"github.com/ibrahimsql/aetherxss/modules/scanner"
+	"github.com/ibrahimsql/aether/modules/config"
+	"github.com/ibrahimsql/aether/modules/scanner"
 )
 
 // Server represents the AetherXSS server

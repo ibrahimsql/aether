@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/hahwul/dalfox/v2/internal/printing"
-	"github.com/hahwul/dalfox/v2/pkg/scanning"
+	"github.com/aether/aether/v2/internal/printing"
+	"github.com/aether/aether/v2/pkg/scanning"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +33,7 @@ func runURLCmd(cmd *cobra.Command, args []string) {
 
 func printUrlErrorAndUsage() {
 	printing.DalLog("ERROR", "Input target url", options)
-	printing.DalLog("ERROR", "e.g dalfox url https://google.com/?q=1", options)
+	printing.DalLog("ERROR", "e.g aether url https://google.com/?q=1", options)
 }
 
 func init() {

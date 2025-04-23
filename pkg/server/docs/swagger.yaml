@@ -20,19 +20,19 @@ definitions:
 host: localhost:6664
 info:
   contact: {}
-  description: This is a dalfox api swagger
+  description: This is an aether api swagger
   license:
     name: MIT
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Dalfox API
+  title: Aether API
   version: "1.0"
 paths:
   /scan:
     post:
       consumes:
       - application/json
-      description: add dalfox scan
+      description: add aether scan
       parameters:
       - description: json data
         in: body

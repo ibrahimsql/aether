@@ -3,7 +3,7 @@ package printing
 import (
 	"testing"
 
-	"github.com/ibrahimsql/aetherxss/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 func TestBanner(t *testing.T) {

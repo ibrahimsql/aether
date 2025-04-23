@@ -1,4 +1,4 @@
-module github.com/ibrahimsql/aetherxss/lib
+module github.com/ibrahimsql/aether/lib
 
 go 1.23.0
 

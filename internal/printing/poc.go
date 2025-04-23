@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 
-	"github.com/ibrahimsql/aetherxss/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 // LogPoC logs the PoC details and adds request/response data if configured.

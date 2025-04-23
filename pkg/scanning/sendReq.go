@@ -15,13 +15,13 @@ import (
 	"github.com/ibrahimsql/aether/internal/printing"
 	"github.com/ibrahimsql/aether/internal/verification"
 	"github.com/ibrahimsql/aether/pkg/model"
-	vlogger "github.com/ibrahimsql/volt/logger"
+
 	"github.com/sirupsen/logrus"
 )
 
 // SendReq is sending http request (handled GET/POST)
 func SendReq(req *http.Request, payload string, options model.Options) (string, *http.Response, bool, bool, error) {
-	vLog := vlogger.GetLogger(options.Debug)
+	vLog := logrus.New()
 	rLog := vLog.WithFields(logrus.Fields{
 		"data1": payload,
 	})

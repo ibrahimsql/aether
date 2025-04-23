@@ -43,7 +43,7 @@ func Test_toHARCookies(t *testing.T) {
 			Name:     "a",
 			Value:    "a",
 			Path:     "/",
-			Domain:   "hahwul.com",
+			Domain:   "aether.com",
 			Expires:  time.Time{},
 			HttpOnly: false,
 			Secure:   false,

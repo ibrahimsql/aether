@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/hahwul/dalfox/v2/internal/printing"
-	"github.com/hahwul/dalfox/v2/pkg/server"
+	"github.com/aether/aether/v2/internal/printing"
+	"github.com/aether/aether/v2/pkg/server"
 	"github.com/spf13/cobra"
 )
 

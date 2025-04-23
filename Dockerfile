@@ -15,8 +15,8 @@ WORKDIR /app
 COPY --from=build /app/out .
 
 # Create a non-root user for security
-RUN useradd -m aetherxss
-USER aetherxss
+RUN useradd -m aether
+USER aether
 
 # Run the application
 ENTRYPOINT ["dotnet", "AetherXSS.dll"]

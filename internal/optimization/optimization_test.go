@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/hahwul/dalfox/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 func TestGenerateNewRequest(t *testing.T) {
@@ -22,8 +22,8 @@ func TestGenerateNewRequest(t *testing.T) {
 		{
 			name: "test - normal",
 			args: args{
-				url:     "https://www.hahwul.com?q=1",
-				payload: "dalfox",
+				url:     "https://www.aether.com?q=1",
+				payload: "aether",
 				options: model.Options{},
 			},
 			want: true,
@@ -31,8 +31,8 @@ func TestGenerateNewRequest(t *testing.T) {
 		{
 			name: "test - data",
 			args: args{
-				url:     "https://www.hahwul.com?q=1",
-				payload: "dalfox",
+				url:     "https://www.aether.com?q=1",
+				payload: "aether",
 				options: model.Options{
 					Data:   "a=1",
 					Method: "POST",
@@ -43,8 +43,8 @@ func TestGenerateNewRequest(t *testing.T) {
 		{
 			name: "test - header",
 			args: args{
-				url:     "https://www.hahwul.com?q=1",
-				payload: "dalfox",
+				url:     "https://www.aether.com?q=1",
+				payload: "aether",
 				options: model.Options{
 					Header: []string{"Cookie: 1234", "Auth: 12344"},
 				},
@@ -54,8 +54,8 @@ func TestGenerateNewRequest(t *testing.T) {
 		{
 			name: "test - cookie",
 			args: args{
-				url:     "https://www.hahwul.com?q=1",
-				payload: "dalfox",
+				url:     "https://www.aether.com?q=1",
+				payload: "aether",
 				options: model.Options{
 					Cookie: "a=1",
 				},
@@ -65,8 +65,8 @@ func TestGenerateNewRequest(t *testing.T) {
 		{
 			name: "test - ua",
 			args: args{
-				url:     "https://www.hahwul.com?q=1",
-				payload: "dalfox",
+				url:     "https://www.aether.com?q=1",
+				payload: "aether",
 				options: model.Options{
 					UserAgent: "abcd",
 				},
@@ -76,8 +76,8 @@ func TestGenerateNewRequest(t *testing.T) {
 		{
 			name: "test - cookiefromraw",
 			args: args{
-				url:     "https://www.hahwul.com?q=1",
-				payload: "dalfox",
+				url:     "https://www.aether.com?q=1",
+				payload: "aether",
 				options: model.Options{
 					CookieFromRaw: "",
 				},
@@ -148,7 +148,7 @@ func TestMakeHeaderQuery(t *testing.T) {
 		{
 			name: "TestMakeHeaderQuery1",
 			args: args{
-				target: "https://www.hahwul.com",
+				target: "https://www.aether.com",
 				hn:     "param",
 				hv:     "test",
 				options: model.Options{
@@ -188,9 +188,9 @@ func TestMakeRequestQuery(t *testing.T) {
 		{
 			name: "TestMakeRequestQuery1",
 			args: args{
-				target:  "https://www.hahwul.com",
+				target:  "https://www.aether.com",
 				param:   "param",
-				payload: "dalfox",
+				payload: "aether",
 				ptype:   "",
 				pAction: "",
 				pEncode: "htmlEncode",
@@ -207,9 +207,9 @@ func TestMakeRequestQuery(t *testing.T) {
 		{
 			name: "TestMakeRequestQuery2",
 			args: args{
-				target:  "https://www.hahwul.com",
+				target:  "https://www.aether.com",
 				param:   "param",
-				payload: "dalfox",
+				payload: "aether",
 				ptype:   "FORM",
 				pAction: "toAppend",
 				pEncode: "urlEncode",

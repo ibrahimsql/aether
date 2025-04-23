@@ -3,7 +3,7 @@ package server
 import (
 	"testing"
 
-	"github.com/hahwul/dalfox/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 func TestRunMCPServer(t *testing.T) {

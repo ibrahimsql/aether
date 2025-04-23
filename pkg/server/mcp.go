@@ -6,23 +6,22 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hahwul/dalfox/v2/internal/printing"
-	"github.com/hahwul/dalfox/v2/internal/utils"
-	dalfox "github.com/hahwul/dalfox/v2/lib"
-	"github.com/hahwul/dalfox/v2/pkg/model"
-	vlogger "github.com/hahwul/volt/logger"
+	"github.com/ibrahimsql/aether/internal/printing"
+	"github.com/ibrahimsql/aether/internal/utils"
+	aether "github.com/ibrahimsql/aether/lib"
+	"github.com/ibrahimsql/aether/pkg/model"
 	"github.com/mark3labs/mcp-go/mcp"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 )
 
-// RunMCPServer starts the MCP server for Dalfox
+// RunMCPServer starts the MCP server for Aether
 func RunMCPServer(options model.Options) {
-	vLog := vlogger.GetLogger(options.Debug)
+	vLog := options.Debug
 	vLog.Info("Starting MCP Server")
 
 	// Create a new MCP server
 	s := mcpserver.NewMCPServer(
-		"Dalfox XSS Scanner",
+		"Aether",
 		printing.VERSION,
 		mcpserver.WithResourceCapabilities(true, true),
 		mcpserver.WithLogging(),
@@ -30,7 +29,7 @@ func RunMCPServer(options model.Options) {
 	)
 
 	// Add scan tool for standard URL scanning
-	scanTool := mcp.NewTool("scan_with_dalfox",
+	scanTool := mcp.NewTool("scan_with_aether",
 		mcp.WithDescription("Scan for XSS vulnerabilities in a web application"),
 		mcp.WithString("url",
 			mcp.Required(),
@@ -181,14 +180,14 @@ func RunMCPServer(options model.Options) {
 		// Create a goroutine to run the scan
 		go func() {
 			// Set up the target
-			target := dalfox.Target{
+			target := aether.Target{
 				URL:     url,
 				Method:  rqOptions.Method,
 				Options: rqOptions,
 			}
 
 			// Initialize options using the pattern from func.go
-			newOptions := dalfox.Initialize(target, target.Options)
+			newOptions := aether.Initialize(target, target.Options)
 
 			// Keep scan options from parent context
 			newOptions.Scan = options.Scan
@@ -208,7 +207,7 @@ func RunMCPServer(options model.Options) {
 	})
 
 	// Add results tool to get scan results
-	resultsTool := mcp.NewTool("get_results_dalfox",
+	resultsTool := mcp.NewTool("get_results_aether",
 		mcp.WithDescription("Get results of a previously started scan"),
 		mcp.WithString("scan_id",
 			mcp.Required(),

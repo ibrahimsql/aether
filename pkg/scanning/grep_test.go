@@ -27,7 +27,7 @@ func TestGrepping(t *testing.T) {
 		{
 			name:     "No match",
 			data:     "Hello, World!",
-			regex:    "dalfox",
+			regex:    "aether",
 			expected: []string{},
 		},
 		{
@@ -63,14 +63,14 @@ func TestBuiltinGrep(t *testing.T) {
 			name: "SSTI pattern",
 			data: "The result is 2958816",
 			expected: map[string][]string{
-				"dalfox-ssti": {"2958816"},
+				"aether-ssti": {"2958816"},
 			},
 		},
 		{
 			name: "AWS S3 pattern",
 			data: "Please download it from https://bucket-name.s3.amazonaws.com/file.txt",
 			expected: map[string][]string{
-				"dalfox-aws-s3": {"bucket-name.s3.amazonaws.com"},
+				"aether-aws-s3": {"bucket-name.s3.amazonaws.com"},
 			},
 		},
 		{
@@ -78,8 +78,8 @@ func TestBuiltinGrep(t *testing.T) {
 			data: `Please download it from https://bucket-name.s3.amazonaws.com/file.txt
                    MySQL error: Warning: mysql_connect()`,
 			expected: map[string][]string{
-				"dalfox-aws-s3":       {"bucket-name.s3.amazonaws.com"},
-				"dalfox-error-mysql2": {"Warning: mysql_connect()"},
+				"aether-aws-s3":       {"bucket-name.s3.amazonaws.com"},
+				"aether-error-mysql2": {"Warning: mysql_connect()"},
 			},
 		},
 		{
@@ -106,7 +106,7 @@ func TestBuiltinGrep(t *testing.T) {
 				}
 
 				// Check that values match for this specific key
-				if tt.name == "Multiple patterns" && key == "dalfox-error-mysql2" {
+				if tt.name == "Multiple patterns" && key == "aether-error-mysql2" {
 					// Special handling for this test case which seems to have a pattern mismatch
 					if len(resultValues) == 0 {
 						t.Errorf("builtinGrep() for key %s has no matches, expected some", key)
@@ -124,8 +124,8 @@ func TestBuiltinGrep(t *testing.T) {
 			// Check if there are any unexpected keys in the result
 			for key := range result {
 				if _, exists := tt.expected[key]; !exists {
-					// Allow 'dalfox-error-mysql' as it might be triggered by the MySQL error test case
-					if tt.name == "Multiple patterns" && key == "dalfox-error-mysql" {
+					// Allow 'aether-error-mysql' as it might be triggered by the MySQL error test case
+					if tt.name == "Multiple patterns" && key == "aether-error-mysql" {
 						continue
 					}
 					t.Errorf("builtinGrep() unexpected key %s in result", key)

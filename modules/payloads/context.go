@@ -28,7 +28,7 @@ var JavaScriptContextPayloads = []string{
 	"';alert('XSS');//",
 	"\";alert('XSS');//",
 	"\\';alert('XSS');//",
-	"\\";alert('XSS');//",
+	"\\\";alert('XSS');//",
 	"</script><script>alert('XSS')</script>",
 	"'-alert('XSS')-'",
 	"\"-alert('XSS')-\"",

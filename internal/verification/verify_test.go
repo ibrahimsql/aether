@@ -16,8 +16,8 @@ func TestVerifyReflectionWithLine(t *testing.T) {
 		{
 			name: "true-1",
 			args: args{
-				body:    "adff\naetherxss\n1234",
-				payload: "aetherxss",
+				body:    "adff\naether\n1234",
+				payload: "aether",
 			},
 			want:  true,
 			want1: 2,
@@ -26,7 +26,7 @@ func TestVerifyReflectionWithLine(t *testing.T) {
 			name: "false-1",
 			args: args{
 				body:    "adff\111\n1234",
-				payload: "aetherxss",
+				payload: "aether",
 			},
 			want:  false,
 			want1: 0,
@@ -58,8 +58,8 @@ func TestVerifyReflection(t *testing.T) {
 		{
 			name: "true",
 			args: args{
-				body:    "1234aetherxss1234",
-				payload: "aetherxss",
+				body:    "1234aether1234",
+				payload: "aether",
 			},
 			want: true,
 		},
@@ -67,7 +67,7 @@ func TestVerifyReflection(t *testing.T) {
 			name: "false",
 			args: args{
 				body:    "987879788",
-				payload: "aetherxss",
+				payload: "aether",
 			},
 			want: false,
 		},
@@ -93,21 +93,21 @@ func TestVerifyDOM(t *testing.T) {
 		{
 			name: "true-class",
 			args: args{
-				s: "<div class=\"aetherxss\">ab</div>",
+				s: "<div class=\"aether\">ab</div>",
 			},
 			want: true,
 		},
 		{
 			name: "true-id",
 			args: args{
-				s: "<div id=aetherxss>ab</div>",
+				s: "<div id=aether>ab</div>",
 			},
 			want: true,
 		},
 		{
 			name: "false",
 			args: args{
-				s: "<div>aetherxss</div>",
+				s: "<div>aether</div>",
 			},
 			want: false,
 		},

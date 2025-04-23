@@ -9,9 +9,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/ibrahimsql/aetherxss/internal/har"
-	"github.com/ibrahimsql/aetherxss/internal/printing"
-	"github.com/ibrahimsql/aetherxss/pkg/model"
+	"github.com/ibrahimsql/aether/internal/har"
+	"github.com/ibrahimsql/aether/internal/printing"
+	"github.com/ibrahimsql/aether/pkg/model"
 	"github.com/tidwall/sjson"
 )
 

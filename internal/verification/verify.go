@@ -31,6 +31,6 @@ func VerifyDOM(s string) bool {
 		return false
 	}
 
-	// Check for elements with class "aetherxss" or id "aetherxss"
-	return doc.Find(".aetherxss").Length() > 0 || doc.Find("#aetherxss").Length() > 0
+	// Check for elements with class "aether" or id "aether"
+	return doc.Find(".aether").Length() > 0 || doc.Find("#aether").Length() > 0
 }

@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ibrahimsql/aetherxss/modules/payloads"
-	"github.com/ibrahimsql/aetherxss/modules/utils"
+	"github.com/ibrahimsql/aether/modules/payloads"
+	"github.com/ibrahimsql/aether/modules/utils"
 )
 
 // detectWAF detects if a website is protected by a WAF

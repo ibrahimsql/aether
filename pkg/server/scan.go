@@ -3,10 +3,10 @@ package server
 import (
 	"strings"
 
-	dAetherXSS "github.com/ibrahimsql/aetherxss/lib"
-	"github.com/ibrahimsql/aetherxss/pkg/model"
-	scan "github.com/ibrahimsql/aetherxss/pkg/scanning"
-	vlogger "github.com/ibrahimsql/aetherxss/internal/logger"
+	dAetherXSS "github.com/ibrahimsql/aether/lib"
+	"github.com/ibrahimsql/aether/pkg/model"
+	scan "github.com/ibrahimsql/aether/pkg/scanning"
+	vlogger "github.com/ibrahimsql/aether/internal/logger"
 )
 
 // ScanFromAPI is scanning dAetherXSS with REST API

@@ -10,12 +10,9 @@ import (
 	"time"
 
 	spinner "github.com/briandowns/spinner"
-	"github.com/hahwul/dalfox/v2/internal/printing"
-	model "github.com/hahwul/dalfox/v2/pkg/model"
-	"github.com/hahwul/dalfox/v2/pkg/scanning"
-	voltFile "github.com/hahwul/volt/file"
-	voltHar "github.com/hahwul/volt/format/har"
-	voltUtils "github.com/hahwul/volt/util"
+	"github.com/aether/aether/v2/internal/printing"
+	model "github.com/aether/aether/v2/pkg/model"
+	"github.com/aether/aether/v2/pkg/scanning"
 	"github.com/spf13/cobra"
 )
 
@@ -59,14 +56,14 @@ func runFileCmd(cmd *cobra.Command, args []string) {
 
 func runRawDataMode(filePath string, cmd *cobra.Command) {
 	printing.DalLog("SYSTEM", "Using file mode with raw data format", options)
-	ff, err := voltFile.ReadLinesOrLiteral(filePath)
+	ff, err := os.ReadFile(filePath)
 	if err != nil {
 		printing.DalLog("ERROR", "Failed to read file: "+err.Error(), options)
 		return
 	}
 	var path, body, host, target string
 	bodyswitch := false
-	for index, line := range ff {
+	for index, line := range strings.Split(string(ff), "\n") {
 		if index == 0 {
 			parse := strings.Split(line, " ")
 			if len(parse) > 1 {
@@ -116,31 +113,39 @@ func runHarMode(filePath string, cmd *cobra.Command, sf bool) {
 	if (!options.NoSpinner || !options.Silence) && !sf {
 		options.SpinnerObject = spinner.New(spinner.CharSets[14], 100*time.Millisecond, spinner.WithWriter(os.Stderr)) // Build our new spinner
 	}
-	var harObject voltHar.HARObject
+	var harObject map[string]interface{}
 	harFile, err := os.ReadFile(filePath)
 	if err == nil {
 		err = json.Unmarshal(harFile, &harObject)
 		if options.Format == "json" {
 			printing.DalLog("PRINT", "[", options)
 		}
-		for i, entry := range harObject.Log.Entries {
-			var turl string
-			options.NowURL = i + 1
-			if len(entry.Request.QueryString) > 0 {
-				var tquery string
-				for _, query := range entry.Request.QueryString {
-					tquery = tquery + query.Name + "=" + query.Value + "&"
+		entries, ok := harObject["log"].(map[string]interface{})["entries"].([]interface{})
+		if ok {
+			for i, entry := range entries {
+				var turl string
+				options.NowURL = i + 1
+				entryMap, ok := entry.(map[string]interface{})
+				if ok {
+					url, ok := entryMap["request"].(map[string]interface{})["url"].(string)
+					if ok {
+						turl = url
+					}
+					method, ok := entryMap["request"].(map[string]interface{})["method"].(string)
+					if ok {
+						options.Method = method
+					}
+					postData, ok := entryMap["request"].(map[string]interface{})["postData"].(map[string]interface{})
+					if ok {
+						text, ok := postData["text"].(string)
+						if ok {
+							options.Data = text
+						}
+					}
 				}
-				turl = entry.Request.URL + "?" + tquery
-			} else {
-				turl = entry.Request.URL
+				_, _ = scanning.Scan(turl, options, strconv.Itoa(i))
+				updateSpinner(options, sf, i, len(entries))
 			}
-			if entry.Request.PostData.Text != "" {
-				options.Data = entry.Request.PostData.Text
-			}
-			options.Method = entry.Request.Method
-			_, _ = scanning.Scan(turl, options, strconv.Itoa(i))
-			updateSpinner(options, sf, i, len(harObject.Log.Entries))
 		}
 		if options.Format == "json" {
 			printing.DalLog("PRINT", "{}]", options)
@@ -157,12 +162,12 @@ func runFileMode(filePath string, cmd *cobra.Command, sf bool) {
 		options.SpinnerObject = spinner.New(spinner.CharSets[14], 100*time.Millisecond, spinner.WithWriter(os.Stderr)) // Build our new spinner
 	}
 
-	ff, err := voltFile.ReadLinesOrLiteral(filePath)
+	ff, err := os.ReadFile(filePath)
 	if err != nil {
 		printing.DalLog("ERROR", "Failed to read file: "+err.Error(), options)
 		return
 	}
-	targets := voltUtils.UniqueStringSlice(ff)
+	targets := strings.Split(string(ff), "\n")
 	printing.DalLog("SYSTEM", "Loaded "+strconv.Itoa(len(targets))+" target URLs", options)
 	multi, _ := cmd.Flags().GetBool("multicast")
 	mass, _ := cmd.Flags().GetBool("mass")
@@ -185,8 +190,8 @@ func updateSpinner(options model.Options, sf bool, current, total int) {
 }
 
 func printFileErrorAndUsage() {
-printing.DalLog("ERROR", "Please provide a valid target file (targets.txt or rawdata.raw)", options)
-printing.DalLog("ERROR", "Example: dalfox file ./targets.txt or ./rawdata.raw", options)
+	printing.DalLog("ERROR", "Please provide a valid target file (targets.txt or rawdata.raw)", options)
+	printing.DalLog("ERROR", "Example: aether file ./targets.txt or ./rawdata.raw", options)
 }
 
 func init() {

@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  aetherxss:
+  aether:
     build: .
     volumes:
       - ./reports:/app/reports:rw

@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/ibrahimsql/aetherxss/v2/internal/utils"
-	"github.com/ibrahimsql/aetherxss/v2/pkg/model"
+	"github.com/ibrahimsql/aether/internal/utils"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 func boolToColorStr(b bool, options model.Options) string {

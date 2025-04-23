@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/hahwul/dalfox/v2/internal/printing"
-	"github.com/hahwul/dalfox/v2/pkg/scanning"
+	"github.com/aether/aether/v2/internal/printing"
+	"github.com/aether/aether/v2/pkg/scanning"
 	"github.com/spf13/cobra"
 )
 
@@ -48,7 +48,7 @@ func runSxssCmd(cmd *cobra.Command, args []string) {
 
 func printSXSSErrorAndUsage() {
 	printing.DalLog("ERROR", "Input target url", options)
-	printing.DalLog("ERROR", "e.g dalfox sxss https://google.com/?q=1 --trigger https://target/profile", options)
+	printing.DalLog("ERROR", "e.g aether sxss https://google.com/?q=1 --trigger https://target/profile", options)
 }
 
 func init() {

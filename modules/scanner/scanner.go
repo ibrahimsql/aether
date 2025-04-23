@@ -14,9 +14,9 @@ import (
 	"time"
 
 	"github.com/chromedp/chromedp"
-	"github.com/ibrahimsql/aetherxss/modules/config"
-	"github.com/ibrahimsql/aetherxss/modules/payloads"
-	"github.com/ibrahimsql/aetherxss/modules/utils"
+	"github.com/ibrahimsql/aether/modules/config"
+	"github.com/ibrahimsql/aether/modules/payloads"
+	"github.com/ibrahimsql/aether/modules/utils"
 )
 
 // Scanner represents the XSS scanner

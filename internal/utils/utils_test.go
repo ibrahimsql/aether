@@ -3,7 +3,7 @@ package utils
 import (
 	"testing"
 
-	"github.com/hahwul/dalfox/v2/pkg/model"
+	"github.com/aether/aether/v2/pkg/model"
 )
 
 func Test_IndexOf(t *testing.T) {

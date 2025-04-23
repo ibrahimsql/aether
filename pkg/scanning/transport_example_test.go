@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hahwul/dalfox/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 func TestHeaderTransport(t *testing.T) {

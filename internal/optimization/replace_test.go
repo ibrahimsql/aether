@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	model "github.com/hahwul/dalfox/v2/pkg/model"
+	model "github.com/ibrahimsql/aether/pkg/model"
 )
 
 func TestSetPayloadValue(t *testing.T) {

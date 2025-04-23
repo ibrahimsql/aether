@@ -9,11 +9,10 @@ import (
 	"time"
 
 	"github.com/briandowns/spinner"
-	"github.com/hahwul/dalfox/v2/internal/printing"
-	"github.com/hahwul/dalfox/v2/internal/utils"
-	model "github.com/hahwul/dalfox/v2/pkg/model"
-	"github.com/hahwul/dalfox/v2/pkg/scanning"
-	voltUtils "github.com/hahwul/volt/util"
+	"github.com/aether/aether/v2/internal/printing"
+	"github.com/aether/aether/v2/internal/utils"
+	model "github.com/aether/aether/v2/pkg/model"
+	"github.com/aether/aether/v2/pkg/scanning"
 	"github.com/spf13/cobra"
 )
 
@@ -46,7 +45,7 @@ func runPipeCmd(cmd *cobra.Command, args []string) {
 		target := sc.Text()
 		targets = append(targets, target)
 	}
-	targets = voltUtils.UniqueStringSlice(targets)
+	targets = utils.UniqueStringSlice(targets)
 	printing.DalLog("SYSTEM", "Loaded "+strconv.Itoa(len(targets))+" target urls", options)
 
 	multi, _ := cmd.Flags().GetBool("multicast")

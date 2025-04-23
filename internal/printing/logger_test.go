@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/briandowns/spinner"
-	"github.com/ibrahimsql/aetherxss/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model"
 	aurora "github.com/logrusorgru/aurora"
 )
 
@@ -396,7 +396,7 @@ func TestDalLog(t *testing.T) {
 					OutputAll:    true,
 					Silence:      true,
 					IsLibrary:    false,
-					OutputFile:   "/dev/null/aetherxss-test",
+					OutputFile:   "/dev/null/aether-test",
 					Format:       "json",
 					AuroraObject: aurora.NewAurora(true),
 					ScanResult: model.Result{
@@ -415,7 +415,7 @@ func TestDalLog(t *testing.T) {
 					OutputAll:    true,
 					Silence:      true,
 					IsLibrary:    false,
-					OutputFile:   "/dev/null/aetherxss-test",
+					OutputFile:   "/dev/null/aether-test",
 					Format:       "json",
 					AuroraObject: aurora.NewAurora(true),
 					ScanResult: model.Result{

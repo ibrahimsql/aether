@@ -5,19 +5,19 @@ import (
 	"strconv"
 	"time"
 
-	printing "github.com/hahwul/dalfox/v2/internal/printing"
-	"github.com/hahwul/dalfox/v2/internal/utils"
-	"github.com/hahwul/dalfox/v2/pkg/model"
-	_ "github.com/hahwul/dalfox/v2/pkg/server/docs"
+	printing "github.com/ibrahimsql/aether/internal/printing"
+	"github.com/ibrahimsql/aether/internal/utils"
+	"github.com/ibrahimsql/aether/pkg/model"
+	_ "github.com/ibrahimsql/aether/pkg/server/docs"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"github.com/tylerb/graceful"
 )
 
-// @title Dalfox API
+// @title Aether API
 // @version 1.0
-// @description This is a dalfox api swagger
+// @description This is an aether api swagger
 // @termsOfService http://swagger.io/terms/
 
 // @license.name MIT

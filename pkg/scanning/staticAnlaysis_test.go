@@ -5,14 +5,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hahwul/dalfox/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
 type mockRequestSender struct{}
 
 func (m *mockRequestSender) SendReq(req *http.Request, payload string, options model.Options) (string, *http.Response, string, bool, error) {
-	return "response body with dalfoxpathtest", &http.Response{
+	return "response body with aetherpathtest", &http.Response{
 		Header: http.Header{
 			"Content-Type": []string{"text/html; charset=UTF-8"},
 		},
@@ -35,16 +35,16 @@ func Test_checkPathReflection(t *testing.T) {
 		{
 			name: "Path reflection found",
 			args: args{
-				tempURL: "http://example.com/dalfoxpathtest",
+				tempURL: "http://example.com/aetherpathtest",
 				id:      0,
 				options: model.Options{},
 				rl:      newRateLimiter(time.Duration(0)),
 				pathReflection: map[int]string{
-					0: "Injected: /dalfoxpathtest(1)",
+					0: "Injected: /aetherpathtest(1)",
 				},
 			},
 			want: map[int]string{
-				0: "Injected: /dalfoxpathtest(1)",
+				0: "Injected: /aetherpathtest(1)",
 			},
 		},
 		{
@@ -128,7 +128,7 @@ func Test_StaticAnalysis(t *testing.T) {
 	}{
 		{
 			name:   "Static analysis with path reflection",
-			target: "http://example.com/dalfoxpathtest",
+			target: "http://example.com/aetherpathtest",
 			options: model.Options{
 				Timeout: 10,
 				Delay:   1,
@@ -137,7 +137,7 @@ func Test_StaticAnalysis(t *testing.T) {
 				"Content-Type": "text/html; charset=UTF-8",
 			},
 			wantReflection: map[int]string{
-				0: "Injected: /dalfoxpathtest(1)",
+				0: "Injected: /aetherpathtest(1)",
 			},
 		},
 		{

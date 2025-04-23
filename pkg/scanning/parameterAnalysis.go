@@ -17,9 +17,6 @@ import (
 	"github.com/ibrahimsql/aether/internal/printing"
 	"github.com/ibrahimsql/aether/internal/verification"
 	"github.com/ibrahimsql/aether/pkg/model"
-	voltFile "github.com/ibrahimsql/volt/file"
-	vlogger "github.com/ibrahimsql/volt/logger"
-	voltUtils "github.com/ibrahimsql/volt/util"
 	"github.com/sirupsen/logrus"
 )
 
@@ -194,9 +191,9 @@ func processParams(target string, paramsQue chan string, results chan model.Para
 							"htmlEncode",
 						}
 						for _, encoder := range encoders {
-							turl, _ := optimization.MakeRequestQuery(target, k, "aetherxss"+char, "PA-URL", "toAppend", encoder, options)
+							turl, _ := optimization.MakeRequestQuery(target, k, "aether"+char, "PA-URL", "toAppend", encoder, options)
 							rl.Block(tempURL.Host)
-							_, _, _, vrs, _ := SendReq(turl, "aetherxss"+char, options)
+							_, _, _, vrs, _ := SendReq(turl, "aether"+char, options)
 							if vrs {
 								paramResult.Chars = append(paramResult.Chars, char)
 							}
@@ -204,7 +201,7 @@ func processParams(target string, paramsQue chan string, results chan model.Para
 					}()
 				}
 				wg.Wait()
-				paramResult.Chars = voltUtils.UniqueStringSlice(paramResult.Chars)
+				paramResult.Chars = UniqueStringSlice(paramResult.Chars)
 				results <- paramResult
 			}
 		}
@@ -213,8 +210,8 @@ func processParams(target string, paramsQue chan string, results chan model.Para
 
 func ParameterAnalysis(target string, options model.Options, rl *rateLimiter) map[string]model.ParamResult {
 	miningCheckerLine := 0
-	vLog := vlogger.GetLogger(options.Debug)
-	pLog := vLog.WithField("data1", "PA")
+	pLog := logrus.NewEntry(logrus.New())
+	pLog.Logger.SetLevel(logrus.DebugLevel)
 	_, p, dp, err := parseURL(target)
 	params := make(map[string]model.ParamResult)
 	if err != nil {
@@ -241,11 +238,11 @@ func ParameterAnalysis(target string, options model.Options, rl *rateLimiter) ma
 		if options.MiningWordlist == "" {
 			p, dp = addParamsFromWordlist(p, dp, payload.GetGfXSS(), options)
 		} else {
-			ff, err := voltFile.ReadLinesOrLiteral(options.MiningWordlist)
+			ff, err := ioutil.ReadFile(options.MiningWordlist)
 			if err != nil {
 				printing.DalLog("SYSTEM", "Failed to load mining parameter wordlist", options)
 			} else {
-				p, dp = addParamsFromWordlist(p, dp, ff, options)
+				p, dp = addParamsFromWordlist(p, dp, strings.Split(string(ff), "\n"), options)
 			}
 		}
 
@@ -349,4 +346,16 @@ func GetPType(av string) string {
 		return "-FORM"
 	}
 	return ""
+}
+
+func UniqueStringSlice(strings []string) []string {
+	var uniqueStrings []string
+	stringMap := make(map[string]bool)
+	for _, str := range strings {
+		if !stringMap[str] {
+			uniqueStrings = append(uniqueStrings, str)
+			stringMap[str] = true
+		}
+	}
+	return uniqueStrings
 }

@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hahwul/dalfox/v2/internal/har"
-	"github.com/hahwul/dalfox/v2/pkg/model"
+	"github.com/ibrahimsql/aether/internal/har"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 func Test_getTransport(t *testing.T) {
@@ -97,7 +97,7 @@ func Test_getTransport(t *testing.T) {
 					t.Fatalf("Failed to create temp file: %v", err)
 				}
 				defer os.Remove(file.Name())
-				harWriter, err := har.NewWriter(file, &har.Creator{Name: "dalfox", Version: "v2.0.0"})
+				harWriter, err := har.NewWriter(file, &har.Creator{Name: "aether", Version: "v2.0.0"})
 				if err != nil {
 					t.Fatalf("Failed to create HAR writer: %v", err)
 				}
@@ -220,7 +220,7 @@ func TestRandomHeaderTransport(t *testing.T) {
 	}
 }
 
-func TestCustomTransportWithDalfox(t *testing.T) {
+func TestCustomTransportWithAether(t *testing.T) {
 	// Create a test server that returns the headers it received
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		headerValue := r.Header.Get("X-Custom-Value")
@@ -235,13 +235,13 @@ func TestCustomTransportWithDalfox(t *testing.T) {
 		ValuePrefix: "custom-",
 	}
 
-	// Create Dalfox options with the custom transport
+	// Create Aether options with the custom transport
 	options := model.Options{
 		CustomTransport: customTransport,
 		Timeout:         10,
 	}
 
-	// Get the transport from Dalfox
+	// Get the transport from Aether
 	transport := getTransport(options)
 
 	// Create a client with the transport

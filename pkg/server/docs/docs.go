@@ -31,7 +31,7 @@ var doc = `{
     "paths": {
         "/scan": {
             "post": {
-                "description": "add dalfox scan",
+                "description": "add aether scan",
                 "consumes": [
                     "application/json"
                 ],
@@ -158,8 +158,8 @@ var SwaggerInfo = swaggerInfo{
 	Host:        "localhost:6664",
 	BasePath:    "/",
 	Schemes:     []string{},
-	Title:       "Dalfox API",
-	Description: "This is a dalfox api swagger",
+	Title:       "Aether API",
+	Description: "This is an aether api swagger",
 }
 
 type s struct{}

@@ -5,7 +5,7 @@ import (
 	"sync"
 	t "time"
 
-	"github.com/ibrahimsql/aetherxss/internal/har"
+	"github.com/ibrahimsql/aether/internal/har"
 
 	s "github.com/briandowns/spinner"
 	a "github.com/logrusorgru/aurora"

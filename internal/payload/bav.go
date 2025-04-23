@@ -67,7 +67,7 @@ func GetCRLFPayload() []string {
 
 func GetESIIPayload() []string {
 	payload := []string{
-		"<esi:assign name=\"var1\" value=\"dalfox\"><esii-<esi:vars name=\"$(var1)\">",
+		"<esi:assign name=\"var1\" value=\"aether\"><esii-<esi:vars name=\"$(var1)\">",
 	}
 	return payload
 }

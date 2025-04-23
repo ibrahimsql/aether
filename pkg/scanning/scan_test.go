@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hahwul/dalfox/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 // mockServer creates a test server that reflects query parameters and path in its response
@@ -431,7 +431,7 @@ func Test_Scan(t *testing.T) {
 					NoSpinner:     true,
 					SkipDiscovery: true,
 					UniqParam:     []string{"query"},
-					BlindURL:      "https://dalfox.hahwul.com",
+					BlindURL:      "https://aether.aether.com",
 					Data:          "query=1234",
 				},
 				sid: "1",

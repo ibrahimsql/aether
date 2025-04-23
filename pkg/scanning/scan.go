@@ -1,6 +1,7 @@
 package scanning
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,14 +13,12 @@ import (
 	"time"
 
 	"github.com/ibrahimsql/aether/internal/payload"
-	"github.com/ibrahimsql/aether/internal/utils"
-
-	"github.com/briandowns/spinner"
-	"github.com/ibrahimsql/aether/internal/optimization"
 	"github.com/ibrahimsql/aether/internal/printing"
 	"github.com/ibrahimsql/aether/internal/report"
 	"github.com/ibrahimsql/aether/pkg/model"
-	voltFile "github.com/ibrahimsql/volt/file"
+
+	"github.com/briandowns/spinner"
+	"github.com/ibrahimsql/aether/internal/optimization"
 )
 
 const (
@@ -32,6 +31,7 @@ const (
 var (
 	scanObject model.Scan
 	s          = spinner.New(spinner.CharSets[14], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
+	injectedChars = []string{"'", "\"", "`"}
 )
 
 // Scan is main scanning function
@@ -160,6 +160,17 @@ func Scan(target string, options model.Options, sid string) (model.Result, error
 	return scanResult, nil
 }
 
+// utils.IsAllowType fonksiyonunu kendi içimize ekle
+func isAllowType(contentType string) bool {
+	allowedTypes := []string{"application/json", "text/html", "application/x-www-form-urlencoded"}
+	for _, t := range allowedTypes {
+		if strings.Contains(contentType, t) {
+			return true
+		}
+	}
+	return false
+}
+
 // generatePayloads generates XSS payloads based on discovery results.
 func generatePayloads(target string, options model.Options, policy map[string]string, pathReflection map[int]string, params map[string]model.ParamResult) (map[*http.Request]map[string]string, []string) {
 	query := make(map[*http.Request]map[string]string)
@@ -203,8 +214,8 @@ func generatePayloads(target string, options model.Options, policy map[string]st
 	}
 
 	// Custom Payload
-	if (options.SkipDiscovery || utils.IsAllowType(policy["Content-Type"])) && options.CustomPayloadFile != "" {
-		ff, err := voltFile.ReadLinesOrLiteral(options.CustomPayloadFile)
+	if (options.SkipDiscovery || isAllowType(policy["Content-Type"])) && options.CustomPayloadFile != "" {
+		ff, err := readLinesOrLiteral(options.CustomPayloadFile)
 		if err != nil {
 			printing.DalLog("SYSTEM", "Failed to load custom XSS payload file", options)
 		} else {
@@ -232,7 +243,7 @@ func generatePayloads(target string, options model.Options, policy map[string]st
 	}
 
 	// Common Payloads and DOM XSS
-	if (options.SkipDiscovery || utils.IsAllowType(policy["Content-Type"])) && !options.OnlyCustomPayload {
+	if (options.SkipDiscovery || isAllowType(policy["Content-Type"])) && !options.OnlyCustomPayload {
 		cu, _ := url.Parse(target)
 		var cp, cpd url.Values
 		var cpArr, cpdArr []string
@@ -325,62 +336,18 @@ func generatePayloads(target string, options model.Options, policy map[string]st
 		for k, v := range params {
 			if optimization.CheckInspectionParam(options, k) {
 				ptype := ""
-				chars := payload.GetSpecialChar()
 				var badchars []string
 				for _, av := range v.Chars {
-					if utils.IndexOf(av, chars) == -1 {
+					if indexOf(av, payload.GetSpecialChar()) == -1 {
 						badchars = append(badchars, av)
 					}
 					if strings.Contains(av, "PTYPE:") {
 						ptype = GetPType(av)
 					}
-					if strings.Contains(av, "Injected:") {
-						injectedPoint := strings.Split(av, "/")[1:]
-						for _, ip := range injectedPoint {
-							var arr []string
-							if strings.Contains(ip, "inJS") {
-								checkInJS := false
-								if strings.Contains(ip, "double") {
-									for _, ic := range injectedChars {
-										if strings.Contains(ic, "\"") {
-											checkInJS = true
-										}
-									}
-								}
-								if strings.Contains(ip, "single") {
-									for _, ic := range injectedChars {
-										if strings.Contains(ic, "'") {
-											checkInJS = true
-										}
-									}
-								}
-								if checkInJS {
-									arr = optimization.SetPayloadValue(payload.GetInJsPayload(ip), options)
-								} else {
-									arr = optimization.SetPayloadValue(payload.GetInJsBreakScriptPayload(ip), options)
-								}
-							}
-							if strings.Contains(ip, "inHTML") {
-								arr = optimization.SetPayloadValue(payload.GetHTMLPayload(ip), options)
-							}
-							if strings.Contains(ip, "inATTR") {
-								arr = optimization.SetPayloadValue(payload.GetAttrPayload(ip), options)
-							}
-							for _, avv := range arr {
-								if optimization.Optimization(avv, badchars) {
-									encoders := []string{NaN, urlEncode, urlDoubleEncode, htmlEncode}
-									for _, encoder := range encoders {
-										tq, tm := optimization.MakeRequestQuery(target, k, avv, ip+ptype, "toAppend", encoder, options)
-										query[tq] = tm
-									}
-								}
-							}
-						}
-					}
 				}
 				arc := optimization.SetPayloadValue(payload.GetCommonPayload(), options)
 				for _, avv := range arc {
-					if !utils.ContainsFromArray(cpArr, k) && optimization.Optimization(avv, badchars) {
+					if !containsFromArray(cpArr, k) && optimization.Optimization(avv, badchars) {
 						encoders := []string{NaN, urlEncode, urlDoubleEncode, htmlEncode}
 						for _, encoder := range encoders {
 							tq, tm := optimization.MakeRequestQuery(target, k, avv, "inHTML"+ptype, "toAppend", encoder, options)
@@ -441,7 +408,9 @@ func generatePayloads(target string, options model.Options, policy map[string]st
 				payloads, line, size = payload.GetPortswiggerPayload()
 			}
 			if endpoint == "payloadbox" {
-				payloads, line, size = payload.GetPayloadBoxPayload()
+				payloads = payload.GetCommonPayload()
+				line = ""
+				size = ""
 			}
 			if line != "" {
 				printing.DalLog("INFO", "Successfully loaded '"+endpoint+"' payloads ["+line+" lines / "+size+"]", options)
@@ -471,6 +440,20 @@ func generatePayloads(target string, options model.Options, policy map[string]st
 	}
 
 	return query, durls
+}
+
+func readLinesOrLiteral(filePath string) ([]string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines, scanner.Err()
 }
 
 // updateSpinner updates the spinner message during scanning.
@@ -583,4 +566,24 @@ func logPolicyAndPathReflection(policy map[string]string, options model.Options,
 			}
 		}
 	}
+}
+
+// indexOf fonksiyonu
+func indexOf(str string, arr []string) int {
+	for i, v := range arr {
+		if v == str {
+			return i
+		}
+	}
+	return -1
+}
+
+// containsFromArray fonksiyonu
+func containsFromArray(arr []string, str string) bool {
+	for _, v := range arr {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }

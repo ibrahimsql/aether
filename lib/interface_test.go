@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hahwul/dalfox/v2/pkg/model"
+	"github.com/aether/aether/v2/pkg/model"
 )
 
 func TestResult_IsFound(t *testing.T) {

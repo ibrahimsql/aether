@@ -18,9 +18,9 @@ func GetPortswiggerPayloadWithSize() ([]string, int) {
 	return lst, len(lst)
 }
 
-// GetPayloaaetherxssPayloadWithSize is exported interface
-func GetPayloaaetherxssPayloadWithSize() ([]string, int) {
-	lst, _, _ := GetPayloaaetherxssPayload()
+// GetPayloaaetherPayloadWithSize is exported interface
+func GetPayloaaetherPayloadWithSize() ([]string, int) {
+	lst, _, _ := GetPayloaaetherPayload()
 	return lst, len(lst)
 }
 
@@ -61,10 +61,10 @@ func GetPortswiggerPayload() ([]string, string, string) {
 	return payload, line, size
 }
 
-// GetPayloaaetherxssPayload is use for remote payloads (Payloaaetherxss)
-func GetPayloaaetherxssPayload() ([]string, string, string) {
-	apiEndpoint := "xss-aetherxss.json"
-	dataEndpoint := "xss-aetherxss.txt"
+// GetPayloaaetherPayload is use for remote payloads (Payloaaether)
+func GetPayloaaetherPayload() ([]string, string, string) {
+	apiEndpoint := "xss-aether.json"
+	dataEndpoint := "xss-aether.txt"
 	payload, line, size := getAssetIbrahimsql(apiEndpoint, dataEndpoint)
 	return payload, line, size
 }

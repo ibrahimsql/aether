@@ -9,9 +9,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/hahwul/dalfox/v2/internal/har"
-	"github.com/hahwul/dalfox/v2/internal/printing"
-	"github.com/hahwul/dalfox/v2/pkg/model"
+	"github.com/aether/aether/v2/internal/har"
+	"github.com/aether/aether/v2/internal/printing"
+	"github.com/aether/aether/v2/pkg/model"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 )
@@ -35,7 +35,7 @@ var harFilePath string
 var args Args
 
 var rootCmd = &cobra.Command{
-	Use: "dalfox",
+	Use: "aether",
 	Run: func(cmd *cobra.Command, args []string) {
 		printing.Banner(options)
 		printing.DalLog("YELLOW", "Read the help page using the -h flag to see other options and flags!", options)
@@ -336,10 +336,10 @@ func findConfigFile() string {
 
 	// If XDG_CONFIG_HOME is set, look there first
 	if xdgConfigHome != "" {
-		dalfoxConfigDir := filepath.Join(xdgConfigHome, "dalfox")
+		aetherConfigDir := filepath.Join(xdgConfigHome, "aether")
 
 		// Check for config.json file
-		configPath := filepath.Join(dalfoxConfigDir, "config.json")
+		configPath := filepath.Join(aetherConfigDir, "config.json")
 		if fileExists(configPath) {
 			return configPath
 		}
@@ -354,8 +354,8 @@ func findConfigFile() string {
 
 	// Check each directory in XDG_CONFIG_DIRS
 	for _, configDir := range filepath.SplitList(xdgConfigDirs) {
-		dalfoxConfigDir := filepath.Join(configDir, "dalfox")
-		configPath := filepath.Join(dalfoxConfigDir, "config.json")
+		aetherConfigDir := filepath.Join(configDir, "aether")
+		configPath := filepath.Join(aetherConfigDir, "config.json")
 		if fileExists(configPath) {
 			return configPath
 		}
@@ -365,9 +365,9 @@ func findConfigFile() string {
 	// use ~/.config as per XDG spec
 	home, err := os.UserHomeDir()
 	if err == nil {
-		homeConfigDir := filepath.Join(home, ".config", "dalfox")
+		homeConfigDir := filepath.Join(home, ".config", "aether")
 
-		// Check for config.json file in home/.config/dalfox
+		// Check for config.json file in home/.config/aether
 		configPath := filepath.Join(homeConfigDir, "config.json")
 		if fileExists(configPath) {
 			return configPath
@@ -392,7 +392,7 @@ func initHarWriter() {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		options.HarWriter, err = har.NewWriter(f, &har.Creator{Name: "dalfox", Version: printing.VERSION})
+		options.HarWriter, err = har.NewWriter(f, &har.Creator{Name: "aether", Version: printing.VERSION})
 		if err != nil {
 			fmt.Println(err)
 		}

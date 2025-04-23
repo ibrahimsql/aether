@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/hahwul/dalfox/v2/internal/har"
+	"github.com/aether/aether/v2/internal/har"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/sjson"
@@ -20,7 +20,7 @@ type Test struct {
 	Name string
 }
 
-var creator = &har.Creator{Name: "dalfox tests", Version: "0.0"}
+var creator = &har.Creator{Name: "aether tests", Version: "0.0"}
 
 func TestSingleRequest(t *testing.T) {
 	buf := &bytes.Buffer{}
@@ -31,7 +31,7 @@ func TestSingleRequest(t *testing.T) {
 	rt := har.NewRoundTripper(nil, hw, nil)
 	c := &http.Client{Transport: rt}
 
-	resp, err := c.Get("https://www.hahwul.com")
+	resp, err := c.Get("https://www.aether.com")
 	require.NoError(t, err)
 	assert.NotNil(t, resp)
 	assert.Equal(t, 200, resp.StatusCode)
@@ -54,7 +54,7 @@ func TestMultipleRequests(t *testing.T) {
 	g, _ := errgroup.WithContext(context.Background())
 	for idx := 0; idx < 5; idx++ {
 		g.Go(func() error {
-			resp, err := c.Get("https://www.hahwul.com")
+			resp, err := c.Get("https://www.aether.com")
 			require.NoError(t, err)
 			assert.NotNil(t, resp)
 			assert.Equal(t, 200, resp.StatusCode)
@@ -91,7 +91,7 @@ func TestRewrite(t *testing.T) {
 
 	c := &http.Client{Transport: rt}
 
-	req, _ := http.NewRequestWithContext(ctx, "GET", "https://www.hahwul.com", nil)
+	req, _ := http.NewRequestWithContext(ctx, "GET", "https://www.aether.com", nil)
 	req = har.AddMessageIDToRequest(req)
 	firstMessageID := har.MessageIDFromRequest(req)
 
@@ -99,7 +99,7 @@ func TestRewrite(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotNil(t, resp)
 
-	req, _ = http.NewRequestWithContext(ctx, "GET", "https://www.hahwul.com/?a=b&c=d", nil)
+	req, _ = http.NewRequestWithContext(ctx, "GET", "https://www.aether.com/?a=b&c=d", nil)
 	req = har.AddMessageIDToRequest(req)
 	secondMessageID := har.MessageIDFromRequest(req)
 

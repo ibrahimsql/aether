@@ -1,21 +1,22 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
-	"os"
-	"strings"
-	"strconv"
 	"io/ioutil"
-	"encoding/json"
-	"time"
+	"os"
 	"sort"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/ibrahimsql/aether/modules/config"
 	"github.com/ibrahimsql/aether/modules/core"
+	"github.com/ibrahimsql/aether/modules/output"
+	"github.com/ibrahimsql/aether/modules/portscan"
 	"github.com/ibrahimsql/aether/modules/scanner"
 	"github.com/ibrahimsql/aether/modules/utils"
-	"github.com/ibrahimsql/aether/modules/portscan"
 )
 
 func main() {
@@ -28,16 +29,16 @@ func main() {
 
 	// Define modes
 	modes := map[string]func([]string){
-		"url":       scanSingleURLMode,
-		"file":      scanFileURLsMode,
-		"pipe":      scanPipeMode,
-		"server":    apiServerMode,
-		"stored":    scanStoredXSSMode,
-		"mcp":       multiContextPayloadMode,
-		"version":   showVersionMode,
-		"help":      showHelpMode,
-		"install":   installAetherMode,
-		"uninstall": uninstallAetherMode,
+		"url":         scanSingleURLMode,
+		"file":        scanFileURLsMode,
+		"pipe":        scanPipeMode,
+		"server":      apiServerMode,
+		"stored":      scanStoredXSSMode,
+		"mcp":         multiContextPayloadMode,
+		"version":     showVersionMode,
+		"help":        showHelpMode,
+		"install":     installAetherMode,
+		"uninstall":   uninstallAetherMode,
 		"portscanner": portScannerFastMode,
 	}
 
@@ -64,7 +65,7 @@ func portScannerFastMode(args []string) {
 	threadsShort := fs.Int("t", 500, "Number of threads [shorthand]")
 	timeout := fs.Int("timeout", 500, "Timeout per port in ms")
 	timeoutShort := fs.Int("to", 500, "Timeout per port in ms [shorthand]")
-	output := fs.String("o", "", "Write output to file (optional)")
+	outputFormat := fs.String("o", "", "Write output to file (optional)")
 	jsonOut := fs.Bool("json", false, "Write output in JSON format")
 	fs.Usage = func() {
 		fmt.Println(`Usage:\n  aether portscanner [flags]\n\nFlags:\n  -host, -h\tTarget hosts (comma-separated, required)\n  -ports, -p\tPorts to scan (e.g. 80,443,100-200) [optional]\n  -all\tScan all 65535 ports\n  -nmap-script\tRun nmap script on open ports (e.g. http-title)\n  -threads, -t\tNumber of threads (default 500)\n  -timeout, -to\tTimeout per port in ms (default 500)\n  -o\tWrite output to file (optional)\n  -json\tWrite output in JSON format (optional)\n  -help\tShow this message\n\nExamples:\n  aether portscanner -host scanme.nmap.org -p 80,443,8080 -t 1000 -to 1000\n  aether portscanner -host scanme.nmap.org -all\n  aether portscanner -host scanme.nmap.org -nmap-script http-title\n`)
@@ -105,7 +106,9 @@ func portScannerFastMode(args []string) {
 	allResults := make([]portscan.ScanResult, 0)
 	for _, host := range hosts {
 		host = strings.TrimSpace(host)
-		if host == "" { continue }
+		if host == "" {
+			continue
+		}
 		fmt.Printf("Scanning %s with %d threads and %dms timeout...\n", host, th, to)
 		results := fps.Scan(host, ports)
 		allResults = append(allResults, results...)
@@ -127,19 +130,19 @@ func portScannerFastMode(args []string) {
 	}
 	if *jsonOut {
 		jsonBytes, _ := json.MarshalIndent(allResults, "", "  ")
-		if *output != "" {
-			ioutil.WriteFile(*output, jsonBytes, 0644)
+		if *outputFormat != "" {
+			ioutil.WriteFile(*outputFormat, jsonBytes, 0644)
 		} else {
 			fmt.Println(string(jsonBytes))
 		}
-	} else if *output != "" {
+	} else if *outputFormat != "" {
 		var lines []string
 		for _, r := range allResults {
 			if r.Open {
 				lines = append(lines, fmt.Sprintf("%s:%d open", r.Host, r.Port))
 			}
 		}
-		ioutil.WriteFile(*output, []byte(strings.Join(lines, "\n")), 0644)
+		ioutil.WriteFile(*outputFormat, []byte(strings.Join(lines, "\n")), 0644)
 	}
 }
 
@@ -176,24 +179,40 @@ func parsePortList(s string) []int {
 
 func printBanner() {
 	banner := `
-    ___       __   __   ________  ________  ________  ________  
-   |\  \     |\  \|\  \|\   __  \|\   __  \|\   __  \|\   ___  \ 
-   \ \  \    \ \  \ \  \ \  \|\  \ \  \|\  \ \  \|\  \ \  \\ \  \ 
- __ \ \  \  __\ \  \ \  \ \   __  \ \   ____\ \   __  \ \  \\ \  \ 
-|\  \\_\  \|\__\_\  \ \  \ \  \ \  \ \  \___|\ \  \ \  \ \  \\ \  \ 
-\ \________\|__|\__\ \__\ \__\ \__\ \__\    \ \__\ \__\ \__\\ \__\
- \|________|   \|__|\|__|\|__|\|__|\|__|     \|__|\|__|\|__| \|__|
-
-Aether - Advanced XSS Scanner
-Author: ibrahimsql
-Github: https://github.com/ibrahimsql/aether
-Website: https://aether.ibrahimsql.com
-Version: v2.0.0
+===*                                *===                              
+                      x+**x+        ·+*$@@@@@@@@@@@@$*+·        +x**++                          
+                    ++==        +$@@@@@@$$$$$$$$$$$$@@@@@@$+        =*++                        
+                  ++==      ·%@@@$$$$$$$$$$$$$$$$$$$$$$$$$$@@@%·      =*++                      
+                ++==      =@@@$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$@@@=      ==++                    
+                **o·    =@@$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$@@=    ·o**                    
+              ++++    ·@@$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$@@·    ++++                  
+              =*     +@$$$$$$$$$@@@@@$$$$$$$$$$$$$$$$$$@@@@@@$$$$$$$$@+     *=                  
+            x+++    =@$$$$$$@@@@$%%%$$@@@$$$$$$$$$$@@@@$%%%%$@@@@$$$$$@=    +++x                
+            +++·   ·@$$$$$@$x           o$@$$$$$$@@*            *@@$$$$@·   ·+++                
+            ==     @$$$$$@·      ~xx      ·@$$$$@=      ·ox~      $@$$$$@     ==                
+            ==     @$$$$@    +·        ~    @$$@+    x             $$$$$@     ==                
+            ==    ·@$$$@+   *          *~   $$$@    *          @   x@$$$@·    ==                
+            ==    ·@$$$@x   @    ·$    x    @$$$   ox    $     =   =@$$$@·    ==                
+            ==    ·@$$$$$    *             *$$$@    *             ~@$$$$@·    ==                
+            ==    ·@$$$$@*        ·*%~  ~*@@$$$$@         +%x·  +$@$$$$$@·    ==                
+            ==    ·@$$$$$@@x          +@@@$$$$$$$@*           @@@$$$$$$$@·    ==                
+            ==    ·@$$$$$$$@@@*x·    ~*$$$$$$$$$$$@@@%+~     +$$$$$$$$$$@·    ==                
+            ==    ·@$$$$$$$$$$@@@@@@@@@$$$$$$$$$$$$$$@@@@@@@@@$$$$$$$$$$@·    ==                
+            ==    ·@$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$@·    ==                
+            ==    ·@$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$@·    ==                
+            ==    ·@$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$@·    ==                
+            ==    ~$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$~    ==                
+            ==     @$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$@     ==                
+            ==     *@$$$$$$$$$$$$$@@@@@@$$$$$$$$$$$$@@@@@@$$$$$$$$$$$$$@*     ==                
+            +++x    ·$@@@@$$$@@@@@*xoo+$@@@@@$$@@@@@$+oox*@@@@@$$$@@@@@~    x+++                
+              **       ~=%$$$$*o          +%$$$$%+          o*$$$$%*o       **                 
 `
 	fmt.Println(banner)
-	fmt.Println("Aether - Advanced XSS Scanner")
-	fmt.Println("Developed by Ibrahim SQL")
-	fmt.Println("https://github.com/ibrahimsql/aether")
+	fmt.Println()
+	fmt.Println(" Powerful open-source XSS scanner and utility focused on automation👻")
+	fmt.Println()
+	fmt.Println("  Version : aether v2.11.0")
+	fmt.Println("  Help    : Run with -h to see all options and flags")
 	fmt.Println()
 }
 
@@ -212,12 +231,42 @@ func printUsage() {
 	fmt.Println("  install  - Install Aether")
 	fmt.Println("  uninstall - Uninstall Aether")
 	fmt.Println()
+
+	fmt.Println("Common flags:")
+	fmt.Println("  --config         Path to configuration file")
+	fmt.Println("  --output         Output format (plain, json, jsonl)")
+	fmt.Println("  --verbose        Enable verbose output")
+	fmt.Println("  --silent         Enable silent mode")
+	fmt.Println("  --threads        Number of threads")
+	fmt.Println("  --timeout        Timeout in seconds")
+	fmt.Println("  --delay          Delay between requests in milliseconds")
+	fmt.Println()
+
+	fmt.Println("Feature flags:")
+	fmt.Println("  --param-mining   Enable parameter mining")
+	fmt.Println("  --blind-xss      Enable blind XSS testing")
+	fmt.Println("  --dom-xss        Enable DOM XSS testing")
+	fmt.Println("  --custom-alert   Custom alert value")
+	fmt.Println("  --custom-payload Path to custom payload file")
+	fmt.Println("  --follow-redirects Follow redirects")
+	fmt.Println("  --proxy          Proxy URL (e.g., http://127.0.0.1:8080)")
+	fmt.Println("  --headers        Custom headers (format: 'Name: Value,Name2: Value2')")
+	fmt.Println("  --cookies        Custom cookies (format: 'name=value; name2=value2')")
+	fmt.Println("  --method         HTTP method (GET, POST)")
+	fmt.Println("  --data           POST data")
+	fmt.Println()
+
+	fmt.Println("Output flags:")
+	fmt.Println("  --report         Path to save report")
+	fmt.Println("  --har            Path to save HAR file")
+	fmt.Println()
+
 	fmt.Println("Examples:")
 	fmt.Println("  aether url https://example.com --param-mining")
 	fmt.Println("  aether file urls.txt --threads 10")
 	fmt.Println("  cat urls.txt | aether pipe --output json")
-	fmt.Println()
-	fmt.Println("For more information, use: aether help")
+	fmt.Println("  aether stored https://example.com --form-url https://example.com/form --result-url https://example.com/result")
+	fmt.Println("  aether mcp https://example.com --payload \"<script>alert(1)</script>\" --contexts \"html,js\"")
 }
 
 func scanSingleURLMode(args []string) {
@@ -231,7 +280,7 @@ func scanSingleURLMode(args []string) {
 
 	// Common flags
 	configFile := urlCmd.String("config", "", "Path to configuration file")
-	output := urlCmd.String("output", "plain", "Output format (plain, json, jsonl)")
+	outputFormat := urlCmd.String("output", "plain", "Output format (plain, json, jsonl)")
 	verbose := urlCmd.Bool("verbose", false, "Enable verbose output")
 	silent := urlCmd.Bool("silent", false, "Enable silent mode")
 
@@ -267,7 +316,7 @@ func scanSingleURLMode(args []string) {
 	cfg := &config.Config{
 		URL:             url,
 		ConfigFile:      *configFile,
-		OutputFormat:    *output,
+		OutputFormat:    *outputFormat,
 		Verbose:         *verbose,
 		Silent:          *silent,
 		Threads:         *threads,
@@ -316,7 +365,7 @@ func scanFileURLsMode(args []string) {
 
 	// Common flags
 	configFile := fileCmd.String("config", "", "Path to configuration file")
-	output := fileCmd.String("output", "plain", "Output format (plain, json, jsonl)")
+	outputFormat := fileCmd.String("output", "plain", "Output format (plain, json, jsonl)")
 	verbose := fileCmd.Bool("verbose", false, "Enable verbose output")
 	silent := fileCmd.Bool("silent", false, "Enable silent mode")
 
@@ -352,7 +401,7 @@ func scanFileURLsMode(args []string) {
 	cfg := &config.Config{
 		FilePath:        filePath,
 		ConfigFile:      *configFile,
-		OutputFormat:    *output,
+		OutputFormat:    *outputFormat,
 		Verbose:         *verbose,
 		Silent:          *silent,
 		Threads:         *threads,
@@ -396,7 +445,7 @@ func scanPipeMode(args []string) {
 
 	// Common flags
 	configFile := pipeCmd.String("config", "", "Path to configuration file")
-	output := pipeCmd.String("output", "plain", "Output format (plain, json, jsonl)")
+	outputFormat := pipeCmd.String("output", "plain", "Output format (plain, json, jsonl)")
 	verbose := pipeCmd.Bool("verbose", false, "Enable verbose output")
 	silent := pipeCmd.Bool("silent", false, "Enable silent mode")
 
@@ -428,7 +477,7 @@ func scanPipeMode(args []string) {
 	// Create configuration
 	cfg := &config.Config{
 		ConfigFile:      *configFile,
-		OutputFormat:    *output,
+		OutputFormat:    *outputFormat,
 		Verbose:         *verbose,
 		Silent:          *silent,
 		Threads:         *threads,
@@ -476,7 +525,7 @@ func apiServerMode(args []string) {
 
 	// Common flags
 	configFile := serverCmd.String("config", "", "Path to configuration file")
-	output := serverCmd.String("output", "plain", "Output format (plain, json, jsonl)")
+	outputFormat := serverCmd.String("output", "plain", "Output format (plain, json, jsonl)")
 	verbose := serverCmd.Bool("verbose", false, "Enable verbose output")
 	silent := serverCmd.Bool("silent", false, "Enable silent mode")
 
@@ -496,7 +545,7 @@ func apiServerMode(args []string) {
 	// Create configuration
 	cfg := &config.Config{
 		ConfigFile:   *configFile,
-		OutputFormat: *output,
+		OutputFormat: *outputFormat,
 		Verbose:      *verbose,
 		Silent:       *silent,
 		Threads:      *threads,
@@ -533,7 +582,7 @@ func scanStoredXSSMode(args []string) {
 
 	// Common flags
 	configFile := storedCmd.String("config", "", "Path to configuration file")
-	output := storedCmd.String("output", "plain", "Output format (plain, json, jsonl)")
+	outputFormat := storedCmd.String("output", "plain", "Output format (plain, json, jsonl)")
 	verbose := storedCmd.Bool("verbose", false, "Enable verbose output")
 	silent := storedCmd.Bool("silent", false, "Enable silent mode")
 
@@ -556,7 +605,7 @@ func scanStoredXSSMode(args []string) {
 	cfg := &config.Config{
 		URL:          url,
 		ConfigFile:   *configFile,
-		OutputFormat: *output,
+		OutputFormat: *outputFormat,
 		Verbose:      *verbose,
 		Silent:       *silent,
 		Threads:      *threads,
@@ -594,7 +643,7 @@ func multiContextPayloadMode(args []string) {
 
 	// Common flags
 	configFile := mcpCmd.String("config", "", "Path to configuration file")
-	output := mcpCmd.String("output", "plain", "Output format (plain, json, jsonl)")
+	outputFormat := mcpCmd.String("output", "plain", "Output format (plain, json, jsonl)")
 	verbose := mcpCmd.Bool("verbose", false, "Enable verbose output")
 	silent := mcpCmd.Bool("silent", false, "Enable silent mode")
 
@@ -612,7 +661,7 @@ func multiContextPayloadMode(args []string) {
 	cfg := &config.Config{
 		URL:          url,
 		ConfigFile:   *configFile,
-		OutputFormat: *output,
+		OutputFormat: *outputFormat,
 		Verbose:      *verbose,
 		Silent:       *silent,
 		MCPPayload:   *payload,
@@ -638,8 +687,6 @@ func multiContextPayloadMode(args []string) {
 
 func showVersionMode(args []string) {
 	fmt.Println("Aether v2.0.0")
-	fmt.Println("Developed by Ibrahim SQL")
-	fmt.Println("https://github.com/ibrahimsql/aether")
 }
 
 func showHelpMode(args []string) {
