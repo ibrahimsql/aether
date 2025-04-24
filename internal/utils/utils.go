@@ -3,6 +3,7 @@ package utils
 import (
 	"os"
 	"strings"
+	"bufio"
 
 	"golang.org/x/term"
 
@@ -81,4 +82,39 @@ func GetTerminalWidth() int {
 	}
 
 	return width
+}
+
+// UniqueStringSlice returns a new slice with duplicate strings removed.
+func UniqueStringSlice(input []string) []string {
+	seen := make(map[string]struct{})
+	var result []string
+	for _, v := range input {
+		if _, ok := seen[v]; !ok {
+			seen[v] = struct{}{}
+			result = append(result, v)
+		}
+	}
+	return result
+}
+
+// ReadLinesOrLiteral reads a file line by line into a string slice, or returns a slice with the input string if the file does not exist.
+func ReadLinesOrLiteral(pathOrLiteral string) ([]string, error) {
+	if _, err := os.Stat(pathOrLiteral); err == nil {
+		file, err := os.Open(pathOrLiteral)
+		if err != nil {
+			return nil, err
+		}
+		defer file.Close()
+		scanner := bufio.NewScanner(file)
+		var lines []string
+		for scanner.Scan() {
+			line := strings.TrimSpace(scanner.Text())
+			if line != "" {
+				lines = append(lines, line)
+			}
+		}
+		return lines, scanner.Err()
+	}
+	// If not a file, treat as literal
+	return []string{pathOrLiteral}, nil
 }

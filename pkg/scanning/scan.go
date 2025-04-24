@@ -13,13 +13,12 @@ import (
 
 	"github.com/ibrahimsql/aether/internal/payload"
 	"github.com/ibrahimsql/aether/internal/utils"
-
-	"github.com/briandowns/spinner"
 	"github.com/ibrahimsql/aether/internal/optimization"
 	"github.com/ibrahimsql/aether/internal/printing"
 	"github.com/ibrahimsql/aether/internal/report"
 	"github.com/ibrahimsql/aether/pkg/model"
-	voltFile "github.com/ibrahimsql/volt/file"
+
+	"github.com/briandowns/spinner"
 )
 
 const (
@@ -204,7 +203,7 @@ func generatePayloads(target string, options model.Options, policy map[string]st
 
 	// Custom Payload
 	if (options.SkipDiscovery || utils.IsAllowType(policy["Content-Type"])) && options.CustomPayloadFile != "" {
-		ff, err := voltFile.ReadLinesOrLiteral(options.CustomPayloadFile)
+		ff, err := utils.ReadLinesOrLiteral(options.CustomPayloadFile)
 		if err != nil {
 			printing.DalLog("SYSTEM", "Failed to load custom XSS payload file", options)
 		} else {

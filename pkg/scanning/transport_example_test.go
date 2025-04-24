@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ibrahimsql/aether/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 func TestHeaderTransport(t *testing.T) {

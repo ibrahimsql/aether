@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ibrahimsqlsql/aether/internal/optimization"
-	"github.com/ibrahimsqlsql/aether/pkg/model"
+	"github.com/ibrahimsql/aether/internal/optimization"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 // StaticAnalysis is found information on original req/res

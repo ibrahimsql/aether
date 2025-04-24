@@ -13,7 +13,6 @@ import (
 	"github.com/ibrahimsql/aether/v2/internal/utils"
 	model "github.com/ibrahimsql/aether/v2/pkg/model"
 	"github.com/ibrahimsql/aether/v2/pkg/scanning"
-	voltUtils "github.com/ibrahimsql/volt/util"
 	"github.com/spf13/cobra"
 )
 
@@ -49,7 +48,7 @@ func runPipeCmd(cmd *cobra.Command, args []string) {
 		target := sc.Text()
 		targets = append(targets, target)
 	}
-	targets = voltUtils.UniqueStringSlice(targets)
+	targets = utils.UniqueStringSlice(targets)
 	printing.DalLog("SYSTEM", "Loaded "+strconv.Itoa(len(targets))+" target urls", options)
 
 	multi, _ := cmd.Flags().GetBool("multicast")

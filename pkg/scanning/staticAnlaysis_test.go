@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ibrahimsql/aether/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 

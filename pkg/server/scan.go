@@ -3,10 +3,10 @@ package server
 import (
 	"strings"
 
-	vlogger "github.com/ibrahimsql/aether/internal/logger"
 	daether "github.com/ibrahimsql/aether/lib"
 	"github.com/ibrahimsql/aether/pkg/model"
 	scan "github.com/ibrahimsql/aether/pkg/scanning"
+	"github.com/ibrahimsql/aether/pkg/printing"
 )
 
 // ScanFromAPI is scanning aether with REST API
@@ -18,13 +18,12 @@ import (
 // @Success 200 {object} Res
 // @Router /scan [post]
 func ScanFromAPI(url string, rqOptions model.Options, options model.Options, sid string) {
-	vLog := vlogger.GetLogger(options.Debug)
 	target := daether.Target{
 		URL:     url,
 		Method:  rqOptions.Method,
 		Options: rqOptions,
 	}
-	newOptions := aether.Initialize(target, target.Options)
+	newOptions := daether.Initialize(target, target.Options)
 	newOptions.Scan = options.Scan
 	if rqOptions.Method != "" {
 		newOptions.Method = options.Method
@@ -32,14 +31,14 @@ func ScanFromAPI(url string, rqOptions model.Options, options model.Options, sid
 		newOptions.Method = "GET"
 	}
 	escapedURL := cleanURL(url)
-	vLog.WithField("data1", sid).Debug(escapedURL)
-	vLog.WithField("data1", sid).Debug(newOptions)
+	printing.DalLog.Debugf("sid: %s, url: %s", sid, escapedURL)
+	printing.DalLog.Debugf("sid: %s, options: %+v", sid, newOptions)
 	_, err := scan.Scan(url, newOptions, sid)
 	if err != nil {
-		vLog.WithField("data1", sid).Error("Scan failed for URL:", url, ": ", err)
+		printing.DalLog.Errorf("sid: %s, Scan failed for URL: %s, error: %v", sid, url, err)
 		return
 	}
-	vLog.WithField("data1", sid).Info("Scan completed successfully")
+	printing.DalLog.Infof("sid: %s, Scan completed successfully", sid)
 }
 
 // GetScan is get scan information

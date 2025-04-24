@@ -16,10 +16,9 @@ import (
 	"github.com/ibrahimsql/aether/internal/payload"
 	"github.com/ibrahimsql/aether/internal/printing"
 	"github.com/ibrahimsql/aether/internal/verification"
+	"github.com/ibrahimsql/aether/internal/utils"
 	"github.com/ibrahimsql/aether/pkg/model"
-	voltFile "github.com/ibrahimsql/volt/file"
 	vlogger "github.com/ibrahimsql/volt/logger"
-	voltUtils "github.com/ibrahimsql/volt/util"
 	"github.com/sirupsen/logrus"
 )
 
@@ -204,7 +203,7 @@ func processParams(target string, paramsQue chan string, results chan model.Para
 					}()
 				}
 				wg.Wait()
-				paramResult.Chars = voltUtils.UniqueStringSlice(paramResult.Chars)
+				paramResult.Chars = utils.UniqueStringSlice(paramResult.Chars)
 				results <- paramResult
 			}
 		}
@@ -241,7 +240,7 @@ func ParameterAnalysis(target string, options model.Options, rl *rateLimiter) ma
 		if options.MiningWordlist == "" {
 			p, dp = addParamsFromWordlist(p, dp, payload.GetGfXSS(), options)
 		} else {
-			ff, err := voltFile.ReadLinesOrLiteral(options.MiningWordlist)
+			ff, err := utils.ReadLinesOrLiteral(options.MiningWordlist)
 			if err != nil {
 				printing.DalLog("SYSTEM", "Failed to load mining parameter wordlist", options)
 			} else {

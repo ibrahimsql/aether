@@ -8,6 +8,9 @@ import (
 	"time"
 	"strings"
 	"os/exec"
+	"github.com/projectdiscovery/goflags"
+	"github.com/projectdiscovery/naabu/v2/pkg/result"
+	"github.com/projectdiscovery/naabu/v2/pkg/runner"
 )
 
 type ScanResult struct {

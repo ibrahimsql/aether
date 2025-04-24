@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ibrahimsql/aether/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 // mockServer creates a test server that reflects query parameters and path in its response

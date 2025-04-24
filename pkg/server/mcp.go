@@ -18,6 +18,8 @@ import (
 
 // RunMCPServer starts the MCP server for aether
 func RunMCPServer(options model.Options) {
+	// REMOVE: vlogger usage (already commented out)
+	// No action needed unless uncommented in the future
 	// TODO: The following usages of 'vlogger' are commented out due to missing import. Update after refactoring or providing the correct package path.
 	// vLog := vlogger.GetLogger(options.Debug)
 	// vLog.Info("Starting MCP Server")

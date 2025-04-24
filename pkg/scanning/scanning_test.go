@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ibrahimsqlsql/aether/v2/pkg/model"
+	"github.com/ibrahimsql/aether/v2/pkg/model"
 )
 
 func Test_performScanning(t *testing.T) {

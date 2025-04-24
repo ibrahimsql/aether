@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ibrahimsqlsql/aether/v2/pkg/model"
+	"github.com/ibrahimsql/aether/v2/pkg/model"
 )
 
 // This file contains examples of how to use the custom transport feature.

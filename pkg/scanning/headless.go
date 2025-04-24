@@ -8,7 +8,7 @@ import (
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
-	"github.com/ibrahimsqlsql/aether/v2/pkg/model"
+	"github.com/ibrahimsql/aether/v2/pkg/model"
 )
 
 var chromeCtx context.Context

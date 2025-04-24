@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ibrahimsql/aether/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model"
 )
 
 func TestSendReq(t *testing.T) {

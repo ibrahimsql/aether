@@ -11,7 +11,7 @@ import (
 
 	"github.com/ibrahimsql/aether/internal/payload"
 	"github.com/ibrahimsql/aether/internal/printing"
-	"github.com/ibrahimsql/aether/v2/pkg/model"
+	"github.com/ibrahimsql/aether/pkg/model
 )
 
 // Function variables for mocking

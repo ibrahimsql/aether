@@ -15,16 +15,12 @@ import (
 	"github.com/ibrahimsql/aether/internal/printing"
 	"github.com/ibrahimsql/aether/internal/verification"
 	"github.com/ibrahimsql/aether/pkg/model"
-	vlogger "github.com/ibrahimsql/volt/logger"
 	"github.com/sirupsen/logrus"
 )
 
 // SendReq is sending http request (handled GET/POST)
 func SendReq(req *http.Request, payload string, options model.Options) (string, *http.Response, bool, bool, error) {
-	vLog := vlogger.GetLogger(options.Debug)
-	rLog := vLog.WithFields(logrus.Fields{
-		"data1": payload,
-	})
+	var rLog *logrus.Entry = nil
 	client := createHTTPClient(options)
 	oReq := req
 
@@ -98,8 +94,6 @@ func handleTrigger(options model.Options, payload string, req *http.Request, str
 	client := createHTTPClient(options)
 	resp, err := client.Do(treq)
 	if err != nil {
-		rLog.WithField("data2", "vds").Debug(false)
-		rLog.WithField("data2", "vrs").Debug(false)
 		return "", resp, false, false, err
 	}
 	bytes, _ := io.ReadAll(resp.Body)
@@ -107,8 +101,6 @@ func handleTrigger(options model.Options, payload string, req *http.Request, str
 	if resp.Header["Content-Type"] != nil && utils.IsAllowType(resp.Header["Content-Type"][0]) {
 		vds := verification.VerifyDOM(str)
 		vrs := verification.VerifyReflection(str, payload)
-		rLog.WithField("data2", "vds").Debug(vds)
-		rLog.WithField("data2", "vrs").Debug(vrs)
 		return str, resp, vds, vrs, nil
 	}
 	return str, resp, false, false, nil
@@ -137,12 +129,8 @@ func processResponse(str string, resp *http.Response, payload string, req *http.
 			// Only run headless verification if VerifyDOM failed
 			vds = CheckXSSWithHeadless(req.URL.String(), options)
 		}
-		rLog.WithField("data2", "vds").Debug(vds)
-		rLog.WithField("data2", "vrs").Debug(vrs)
 		return str, resp, vds, vrs, nil
 	}
-	rLog.WithField("data2", "vds").Debug(false)
-	rLog.WithField("data2", "vrs").Debug(false)
 	return str, resp, false, false, nil
 }
 
