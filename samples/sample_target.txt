@@ -1,2 +1,0 @@
-http://testphp.vulnweb.com/artists.php?artist=1
-https://xss-game.appspot.com/level1/frame
