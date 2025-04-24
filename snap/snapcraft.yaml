@@ -1,0 +1,27 @@
+---
+name: aether
+summary: Powerful open-source XSS scanner and utility focused on automation.
+description: |
+  aether is a powerful open-source tool that focuses on automation, making it ideal for quickly scanning for XSS flaws and analyzing parameters.
+  Its advanced testing engine and niche features are designed to streamline the process of detecting and verifying vulnerabilities.
+base: core20
+grade: stable
+confinement: strict
+license: MIT
+version: v3.11.0
+
+apps:
+  aether:
+    command: aether
+    plugs: [home, network, network-bind]
+parts:
+  aether:
+    source: https://github.com/ibrahimsql/aether.git
+    source-type: git
+    plugin: go
+    build-snaps: [go]
+    build-packages: [build-essential]
+    override-build: |
+      go build .
+      cp ./aether $SNAPCRAFT_PART_INSTALL/
+      snapcraftctl build
