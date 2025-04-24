@@ -16,10 +16,10 @@ func Banner(options model.Options) {
 \ \________\|__|\__\ \__\ \__\ \__\ \__\    \ \__\ \__\ \__\\ \__\
  \|________|   \|__|\|__|\|__|\|__|\|__|     \|__|\|__|\|__| \|__|
 
-Aether - Advanced XSS Scanner
+AetherXSS - Advanced XSS Scanner
 Author: ibrahimsql
-Github: https://github.com/ibrahimsql/aether
-Website: https://aether.ibrahimsql.com
+Github: https://github.com/ibrahimsql/aetherxss
+Website: https://aetherxss.ibrahimsql.com
 Version: v2.0.0
 `
 	fmt.Println(banner)

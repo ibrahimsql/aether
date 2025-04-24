@@ -697,7 +697,7 @@ func showHelpMode(args []string) {
 }
 
 func installAetherMode(args []string) {
-	fmt.Println("Installing Aether...")
+	fmt.Println("Installing AetherXSS...")
 
 	// Check if Go is installed
 	if !utils.CommandExists("go") {
@@ -706,30 +706,30 @@ func installAetherMode(args []string) {
 	}
 
 	// Build the binary
-	fmt.Println("Building Aether...")
-	if err := utils.RunCommand("go", "build", "-o", "aether"); err != nil {
-		fmt.Printf("Error building Aether: %v\n", err)
+	fmt.Println("Building AetherXSS...")
+	if err := utils.RunCommand("go", "build", "-o", "aetherxss"); err != nil {
+		fmt.Printf("Error building AetherXSS: %v\n", err)
 		return
 	}
 
 	// Move the binary to /usr/local/bin
-	fmt.Println("Installing Aether to /usr/local/bin...")
-	if err := utils.RunCommand("sudo", "mv", "aether", "/usr/local/bin/"); err != nil {
-		fmt.Printf("Error installing Aether: %v\n", err)
+	fmt.Println("Installing AetherXSS to /usr/local/bin...")
+	if err := utils.RunCommand("sudo", "mv", "aetherxss", "/usr/local/bin/"); err != nil {
+		fmt.Printf("Error installing AetherXSS: %v\n", err)
 		return
 	}
 
-	fmt.Println("Aether installed successfully!")
+	fmt.Println("AetherXSS installed successfully!")
 }
 
 func uninstallAetherMode(args []string) {
-	fmt.Println("Uninstalling Aether...")
+	fmt.Println("Uninstalling AetherXSS...")
 
 	// Remove the binary from /usr/local/bin
-	if err := utils.RunCommand("sudo", "rm", "/usr/local/bin/aether"); err != nil {
-		fmt.Printf("Error uninstalling Aether: %v\n", err)
+	if err := utils.RunCommand("sudo", "rm", "/usr/local/bin/aetherxss"); err != nil {
+		fmt.Printf("Error uninstalling AetherXSS: %v\n", err)
 		return
 	}
 
-	fmt.Println("Aether uninstalled successfully!")
+	fmt.Println("AetherXSS uninstalled successfully!")
 }

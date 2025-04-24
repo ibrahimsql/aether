@@ -4,8 +4,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/ibrahimsql/aether/internal/printing"
-	"github.com/ibrahimsql/aether/pkg/model"
+	"github.com/ibrahimsql/aetherxss/internal/printing"
+	"github.com/ibrahimsql/aetherxss/pkg/model"
 )
 
 // foundAction is after command function.

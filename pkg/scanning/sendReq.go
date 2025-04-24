@@ -9,12 +9,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ibrahimsql/aether/internal/utils"
+	"github.com/ibrahimsql/aetherxss/internal/utils"
 
-	"github.com/ibrahimsql/aether/internal/optimization"
-	"github.com/ibrahimsql/aether/internal/printing"
-	"github.com/ibrahimsql/aether/internal/verification"
-	"github.com/ibrahimsql/aether/pkg/model"
+	"github.com/ibrahimsql/aetherxss/internal/optimization"
+	"github.com/ibrahimsql/aetherxss/internal/printing"
+	"github.com/ibrahimsql/aetherxss/internal/verification"
+	"github.com/ibrahimsql/aetherxss/pkg/model"
 	vlogger "github.com/ibrahimsql/volt/logger"
 	"github.com/sirupsen/logrus"
 )

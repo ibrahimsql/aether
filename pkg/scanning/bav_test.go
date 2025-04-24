@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ibrahimsql/aether/v2/pkg/model"
+	"github.com/ibrahimsql/aetherxss/v2/pkg/model"
 	"github.com/logrusorgru/aurora"
 )
 

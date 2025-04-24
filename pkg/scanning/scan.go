@@ -11,14 +11,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ibrahimsql/aether/internal/payload"
-	"github.com/ibrahimsql/aether/internal/utils"
+	"github.com/ibrahimsql/aetherxss/internal/payload"
+	"github.com/ibrahimsql/aetherxss/internal/utils"
 
 	"github.com/briandowns/spinner"
-	"github.com/ibrahimsql/aether/internal/optimization"
-	"github.com/ibrahimsql/aether/internal/printing"
-	"github.com/ibrahimsql/aether/internal/report"
-	"github.com/ibrahimsql/aether/pkg/model"
+	"github.com/ibrahimsql/aetherxss/internal/optimization"
+	"github.com/ibrahimsql/aetherxss/internal/printing"
+	"github.com/ibrahimsql/aetherxss/internal/report"
+	"github.com/ibrahimsql/aetherxss/pkg/model"
 	voltFile "github.com/ibrahimsql/volt/file"
 )
 
@@ -435,13 +435,12 @@ func generatePayloads(target string, options model.Options, policy map[string]st
 	if options.RemotePayloads != "" {
 		rp := strings.Split(options.RemotePayloads, ",")
 		for _, endpoint := range rp {
+			// TODO: Implement or migrate GetPayloadBoxPayload for aetherxss if needed
+			// boxPayloads := payload.GetPayloadBoxPayload()
 			var payloads []string
 			var line, size string
 			if endpoint == "portswigger" {
 				payloads, line, size = payload.GetPortswiggerPayload()
-			}
-			if endpoint == "payloadbox" {
-				payloads, line, size = payload.GetPayloadBoxPayload()
 			}
 			if line != "" {
 				printing.DalLog("INFO", "Successfully loaded '"+endpoint+"' payloads ["+line+" lines / "+size+"]", options)

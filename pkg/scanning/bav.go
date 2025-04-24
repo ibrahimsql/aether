@@ -5,10 +5,10 @@ import (
 	"net/url"
 	"sync"
 
-	"github.com/ibrahimsql/aether/internal/optimization"
-	"github.com/ibrahimsql/aether/internal/payload"
-	"github.com/ibrahimsql/aether/internal/printing"
-	"github.com/ibrahimsql/aether/pkg/model"
+	"github.com/ibrahimsql/aetherxss/internal/optimization"
+	"github.com/ibrahimsql/aetherxss/internal/payload"
+	"github.com/ibrahimsql/aetherxss/internal/printing"
+	"github.com/ibrahimsql/aetherxss/pkg/model"
 )
 
 // RunBAVAnalysis runs the BAV analysis.

@@ -3,7 +3,7 @@ package scanning
 import (
 	"testing"
 
-	"github.com/ibrahimsql/aether/v2/pkg/model"
+	"github.com/ibrahimsql/aetherxss/v2/pkg/model"
 )
 
 func Test_CheckXSSWithHeadless(t *testing.T) {

@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ibrahimsql/aether/internal/printing"
-	"github.com/ibrahimsql/aether/pkg/model"
+	"github.com/ibrahimsql/aetherxss/internal/printing"
+	"github.com/ibrahimsql/aetherxss/pkg/model"
 )
 
 // performDiscovery handles the discovery phase including static, parameter, and BAV analysis.
